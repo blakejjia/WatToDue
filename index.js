@@ -159,6 +159,10 @@ class DashboardController {
         },
       });
     }
+
+    if (typeof window !== 'undefined' && window.lucide) {
+      window.lucide.createIcons();
+    }
   }
 }
 

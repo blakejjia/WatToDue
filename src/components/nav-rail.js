@@ -1,4 +1,5 @@
 import { el, clear } from '../utils/dom.js';
+import { createIcon } from '../utils/icons.js';
 
 /**
  * Navigation Rail Component.
@@ -41,9 +42,9 @@ export class NavRail {
     const itemsContainer = el('div', { className: 'rail-items' });
 
     const tabs = [
-      { id: 'dues', label: 'Dues', icon: '📅' },
-      { id: 'grades', label: 'Grades', icon: '📊' },
-      { id: 'settings', label: 'Settings', icon: '⚙️' },
+      { id: 'dues', label: 'Dues', icon: 'calendar' },
+      { id: 'grades', label: 'Grades', icon: 'graduation-cap' },
+      { id: 'settings', label: 'Settings', icon: 'settings' },
     ];
 
     for (const tab of tabs) {
@@ -61,7 +62,7 @@ export class NavRail {
             }
           },
         },
-        el('span', { className: 'rail-item-icon' }, tab.icon),
+        el('span', { className: 'rail-item-icon' }, createIcon(tab.icon, { size: 20 })),
         el('span', { className: 'rail-item-label' }, tab.label)
       );
       itemsContainer.appendChild(btn);
@@ -78,7 +79,7 @@ export class NavRail {
           title: 'Open in Full Tab',
           onClick: () => this.onExpand(),
         },
-        '⤢'
+        createIcon('external-link', { size: 16 })
       );
       footer.appendChild(expandBtn);
     }

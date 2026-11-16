@@ -1,5 +1,6 @@
 import { el } from '../utils/dom.js';
 import { formatDueRelative } from '../utils/date-utils.js';
+import { createIcon } from '../utils/icons.js';
 
 /**
  * Extracts 2-4 letter subject abbreviation & course number.
@@ -50,14 +51,14 @@ export function createTimelineCard(due, now = new Date(), onToggleCompleted = ()
   const courseLine = el(
     'div',
     { className: 'timeline-card-meta' },
-    el('span', { className: 'meta-icon' }, '📚'),
+    el('span', { className: 'meta-icon' }, createIcon('book-open', { size: 13 })),
     el('span', { className: 'meta-text' }, due.courseName)
   );
 
   const locationLine = el(
     'div',
     { className: 'timeline-card-meta location' },
-    el('span', { className: 'meta-icon' }, '📍'),
+    el('span', { className: 'meta-icon' }, createIcon('map-pin', { size: 13 })),
     el('span', { className: 'meta-text' }, isQuiz ? 'Waterloo LEARN Quiz' : 'LEARN Drop Box')
   );
 
@@ -73,7 +74,7 @@ export function createTimelineCard(due, now = new Date(), onToggleCompleted = ()
       ? el('span', { className: 'status-pill pill-today' }, 'Due Today')
       : (rel.status === 'tomorrow' ? el('span', { className: 'status-pill pill-tomorrow' }, 'Tomorrow') : null),
     due.completed
-      ? el('span', { className: 'status-pill pill-completed' }, '✓ Completed')
+      ? el('span', { className: 'status-pill pill-completed', style: { display: 'inline-flex', alignItems: 'center', gap: '3px' } }, createIcon('check', { size: 11 }), el('span', {}, 'Completed'))
       : null
   );
 
@@ -110,7 +111,7 @@ export function createTimelineCard(due, now = new Date(), onToggleCompleted = ()
     },
     el('div', { className: 'thumb-subj' }, badgeData.subj),
     el('div', { className: 'thumb-num' }, badgeData.num),
-    el('span', { className: 'thumb-icon' }, '↗')
+    el('span', { className: 'thumb-icon' }, createIcon('external-link', { size: 12 }))
   );
 
   const card = el(

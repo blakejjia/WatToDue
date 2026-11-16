@@ -1,6 +1,7 @@
 import { el, clear } from '../utils/dom.js';
 import { getCourseBadge } from './timeline-card.js';
 import { BASE_URL } from '../api/endpoints.js';
+import { createIcon } from '../utils/icons.js';
 
 /**
  * Returns letter grade string for University of Waterloo grading scale.
@@ -481,8 +482,8 @@ export class GradesView {
           el(
             'div',
             { className: 'category-row-label' },
-            el('span', { className: 'category-toggle-icon' }, isCollapsed ? '▶' : '▼'),
-            el('span', { className: 'category-icon' }, '📁'),
+            el('span', { className: 'category-toggle-icon' }, createIcon(isCollapsed ? 'chevron-right' : 'chevron-down', { size: 14 })),
+            el('span', { className: 'category-icon' }, createIcon(isCollapsed ? 'folder' : 'folder-open', { size: 16, style: { color: 'var(--uw-gold)' } })),
             el('strong', { className: 'category-title' }, cat.name),
             el('span', { className: 'category-pill' }, 'Category Total')
           )
@@ -592,15 +593,18 @@ export class GradesView {
               target: '_blank',
               rel: 'noopener noreferrer',
               title: 'View Quiz Attempts on Waterloo LEARN',
-              style: { textDecoration: 'none' },
+              style: { textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: '4px' },
             },
-            '👤 View Quiz Attempts ↗'
+            createIcon('eye', { size: 12 }),
+            el('span', {}, 'View Quiz Attempts'),
+            createIcon('external-link', { size: 11 })
           );
         } else {
           commentEl = el(
             'span',
-            { className: 'attempts-tag', title: 'Quiz attempts on Waterloo LEARN' },
-            '👤 View Quiz Attempts'
+            { className: 'attempts-tag', title: 'Quiz attempts on Waterloo LEARN', style: { display: 'inline-flex', alignItems: 'center', gap: '4px' } },
+            createIcon('eye', { size: 12 }),
+            el('span', {}, 'View Quiz Attempts')
           );
         }
       } else {
@@ -618,7 +622,7 @@ export class GradesView {
         el(
           'div',
           { className: 'child-item-name-group' },
-          isIndented ? el('span', { className: 'tree-connector' }, '↳') : null,
+          isIndented ? el('span', { className: 'tree-connector' }, createIcon('corner-down-right', { size: 13, style: { opacity: '0.6' } })) : null,
           el('span', { className: 'table-item-name', title: item.name }, item.name)
         )
       ),

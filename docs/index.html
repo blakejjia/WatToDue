@@ -7,6 +7,7 @@
   <meta name="description" content="The modern Chrome extension for University of Waterloo students. Consolidates assignments, quizzes, and grade feedback directly from Waterloo LEARN.">
   <link rel="icon" type="image/png" href="../icons/icon-48.png">
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
   <style>
     :root {
       --uw-gold: #f59e0b;
@@ -31,7 +32,7 @@
         <a href="#screenshots" class="hidden md:inline-block text-slate-400 hover:text-white transition-colors">Screenshots</a>
         <a href="#install" class="hidden md:inline-block text-slate-400 hover:text-white transition-colors">Install</a>
         <a href="https://github.com/blakejjia/WatToDue" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-all flex items-center gap-2">
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <i data-lucide="github" class="w-4 h-4"></i>
           <span>GitHub</span>
         </a>
       </div>
@@ -44,7 +45,8 @@
 
     <div class="max-w-5xl mx-auto px-4 text-center relative z-10 space-y-6">
       <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-semibold">
-        <span>✨ Built specifically for UWaterloo Warriors</span>
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
+        <span>Built for UWaterloo Warriors</span>
       </div>
 
       <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-[1.1]">
@@ -53,16 +55,17 @@
       </h1>
 
       <p class="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 leading-relaxed">
-        WatToDue automatically consolidates all assignment dropboxes, quizzes, and grade feedback across your Waterloo LEARN courses into one clean, high-performance dashboard and toolbar popup.
+        WatToDue pulls all your assignment dropboxes, quizzes, and grade feedback across your Waterloo LEARN courses into one clean, high-performance schedule.
       </p>
 
       <div class="flex items-center justify-center flex-wrap gap-4 pt-4">
         <a href="https://github.com/blakejjia/WatToDue/releases/latest" target="_blank" rel="noopener noreferrer" class="px-6 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-sm shadow-lg shadow-amber-400/20 hover:shadow-amber-400/30 transition-all flex items-center gap-2">
-          <span>📦 Download Extension (ZIP)</span>
-          <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+          <i data-lucide="download" class="w-4 h-4 stroke-[2.5]"></i>
+          <span>Download Extension (ZIP)</span>
         </a>
-        <a href="#install" class="px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-bold text-sm transition-all">
-          Quick Setup Guide ➔
+        <a href="#install" class="px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-bold text-sm transition-all flex items-center gap-2">
+          <span>Quick Setup Guide</span>
+          <i data-lucide="arrow-right" class="w-4 h-4"></i>
         </a>
       </div>
 
@@ -75,8 +78,9 @@
                width="1280" height="600" 
                class="rounded-xl border border-slate-800 w-full object-cover shadow-inner">
         </div>
-        <div class="text-xs text-slate-400 mt-3 font-medium">
-          WatToDue Dashboard Agenda: Date-grouped timeline with side-by-side cards & auto-detected submissions
+        <div class="text-xs text-slate-400 mt-3 font-medium flex items-center justify-center gap-1.5">
+          <i data-lucide="layers" class="w-3.5 h-3.5 text-amber-400"></i>
+          <span>Dashboard Agenda: Date-grouped timeline with multi-card cards & auto-detected submissions</span>
         </div>
       </div>
     </div>
@@ -94,7 +98,7 @@
         <!-- Feature 1 -->
         <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all space-y-3">
           <div class="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400 flex items-center justify-center font-bold text-xl">
-            📅
+            <i data-lucide="calendar" class="w-5 h-5"></i>
           </div>
           <h3 class="text-lg font-bold text-white">Consolidated Deadlines</h3>
           <p class="text-sm text-slate-400 leading-relaxed">
@@ -105,7 +109,7 @@
         <!-- Feature 2 -->
         <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all space-y-3">
           <div class="w-10 h-10 rounded-xl bg-emerald-400/10 border border-emerald-400/20 text-emerald-400 flex items-center justify-center font-bold text-xl">
-            📊
+            <i data-lucide="graduation-cap" class="w-5 h-5"></i>
           </div>
           <h3 class="text-lg font-bold text-white">True Grade Standing</h3>
           <p class="text-sm text-slate-400 leading-relaxed">
@@ -116,7 +120,7 @@
         <!-- Feature 3 -->
         <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all space-y-3">
           <div class="w-10 h-10 rounded-xl bg-blue-400/10 border border-blue-400/20 text-blue-400 flex items-center justify-center font-bold text-xl">
-            🔬
+            <i data-lucide="flask-conical" class="w-5 h-5"></i>
           </div>
           <h3 class="text-lg font-bold text-white">Lab & Lecture Recognition</h3>
           <p class="text-sm text-slate-400 leading-relaxed">
@@ -146,7 +150,10 @@
                  class="rounded-xl border border-slate-800/80 w-full object-cover">
           </div>
           <div>
-            <h3 class="text-lg font-bold text-white">Monthly Calendar Matrix with Day Flyouts</h3>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <i data-lucide="calendar-days" class="w-5 h-5 text-amber-400"></i>
+              <span>Monthly Calendar with Day Flyouts</span>
+            </h3>
             <p class="text-sm text-slate-400 mt-1">
               Select any date with due indicators to inspect side-by-side cards, exact submission times, and deep links.
             </p>
@@ -163,7 +170,10 @@
                  class="rounded-xl border border-slate-800/80 max-h-[400px] object-contain">
           </div>
           <div>
-            <h3 class="text-lg font-bold text-white">1-Click Quick Popup</h3>
+            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+              <i data-lucide="zap" class="w-5 h-5 text-amber-400"></i>
+              <span>1-Click Quick Popup</span>
+            </h3>
             <p class="text-sm text-slate-400 mt-1">
               Stay on top of what is due next without opening a new tab. Check off finished tasks or jump directly to the submission folder.
             </p>
@@ -181,7 +191,10 @@
                class="rounded-xl border border-slate-800/80 w-full object-cover">
         </div>
         <div>
-          <h3 class="text-lg font-bold text-white">Collapsible Categories & Direct Quiz Attempts Links</h3>
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <i data-lucide="folder-tree" class="w-5 h-5 text-amber-400"></i>
+            <span>Collapsible Categories & Direct Quiz Attempts Links</span>
+          </h3>
           <p class="text-sm text-slate-400 mt-1">
             Browse Problem Sets, Tests, and Reflections nested neatly under category folders with real-time weights and direct links to view quiz attempts.
           </p>
@@ -239,15 +252,31 @@
   <!-- Privacy & Footer -->
   <footer class="py-12 border-t border-slate-800 text-center text-xs text-slate-500 space-y-4">
     <div class="flex items-center justify-center gap-6 text-slate-400 font-medium">
-      <a href="https://github.com/blakejjia/WatToDue" class="hover:text-amber-400 transition-colors">GitHub Repository</a>
-      <a href="https://learn.uwaterloo.ca" target="_blank" class="hover:text-amber-400 transition-colors">Waterloo LEARN</a>
-      <a href="https://github.com/blakejjia/WatToDue/blob/main/LICENSE" class="hover:text-amber-400 transition-colors">MIT License</a>
+      <a href="https://github.com/blakejjia/WatToDue" class="hover:text-amber-400 transition-colors flex items-center gap-1.5">
+        <i data-lucide="github" class="w-4 h-4"></i>
+        <span>GitHub Repository</span>
+      </a>
+      <a href="https://learn.uwaterloo.ca" target="_blank" class="hover:text-amber-400 transition-colors flex items-center gap-1.5">
+        <i data-lucide="external-link" class="w-4 h-4"></i>
+        <span>Waterloo LEARN</span>
+      </a>
+      <a href="https://github.com/blakejjia/WatToDue/blob/main/LICENSE" class="hover:text-amber-400 transition-colors flex items-center gap-1.5">
+        <i data-lucide="file-text" class="w-4 h-4"></i>
+        <span>MIT License</span>
+      </a>
     </div>
-    <p>
-      🔒 <strong>Privacy Guarantee</strong>: WatToDue runs 100% locally in your browser. No credentials, tokens, or personal student data are ever collected or sent to external servers.
+    <p class="flex items-center justify-center gap-1.5">
+      <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+      <span><strong>Privacy Guarantee</strong>: WatToDue runs 100% locally in your browser. No credentials, tokens, or personal student data are ever collected or sent to external servers.</span>
     </p>
     <p>© 2026 WatToDue. Built with 💛 for University of Waterloo students.</p>
   </footer>
 
+  <!-- Initialize Lucide Icons -->
+  <script>
+    if (typeof lucide !== 'undefined') {
+      lucide.createIcons();
+    }
+  </script>
 </body>
 </html>

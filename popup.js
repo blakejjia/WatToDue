@@ -64,6 +64,9 @@ class PopupController {
     }));
 
     this.updateBadge();
+    if (typeof window !== 'undefined' && window.lucide) {
+      window.lucide.createIcons();
+    }
   }
 
   updateBadge() {
@@ -93,6 +96,9 @@ class PopupController {
       this.dueList.setDues(this.dues);
     }
     this.updateBadge();
+    if (typeof window !== 'undefined' && window.lucide) {
+      window.lucide.createIcons();
+    }
   }
 
   async triggerSync(force = false) {
