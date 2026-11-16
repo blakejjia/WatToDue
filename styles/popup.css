@@ -1,0 +1,543 @@
+/* ==========================================================================
+   WatToDue - Luma-style Date-grouped Timeline View for Chrome Extension Popup
+   ========================================================================== */
+
+body.popup-mode {
+  width: 400px;
+  height: 580px;
+  max-width: 400px;
+  max-height: 580px;
+  margin: 0;
+  padding: 0;
+  background-color: #f8f9fa;
+  color: var(--text-primary);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+  user-select: none;
+}
+
+.popup-container {
+  display: flex;
+  flex-direction: column;
+  width: 400px;
+  height: 580px;
+  overflow: hidden;
+  background-color: #f8f9fa;
+}
+
+/* ==========================================================================
+   Top Header: Clean Minimalist Bar (matching "Events" reference)
+   ========================================================================== */
+.popup-header {
+  padding: 16px 18px 12px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: #f8f9fa;
+  z-index: 10;
+}
+
+.popup-brand {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.popup-logo {
+  width: 22px;
+  height: 22px;
+  display: none; /* Keep clean like reference title */
+}
+
+.popup-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.4px;
+  color: #111827;
+}
+
+.popup-count-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  background-color: #e5e7eb;
+  color: #374151;
+  letter-spacing: 0;
+}
+
+.popup-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.popup-actions .btn-pill {
+  height: 30px;
+  padding: 0 10px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  background-color: #ffffff;
+  color: #4b5563;
+  font-size: 12px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+
+.popup-actions .btn-pill:hover {
+  background-color: #f3f4f6;
+  border-color: #d1d5db;
+  color: #111827;
+}
+
+.popup-actions .btn-icon-only {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  justify-content: center;
+}
+
+/* ==========================================================================
+   Scrollable Timeline View
+   ========================================================================== */
+.popup-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 4px 14px 24px 16px;
+  position: relative;
+}
+
+.timeline-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Vertical Timeline Spine Line */
+.timeline-spine {
+  position: absolute;
+  top: 14px;
+  bottom: 20px;
+  left: 5px;
+  width: 2px;
+  background-color: #e2e8f0;
+  z-index: 1;
+}
+
+/* Date Group Block */
+.timeline-group {
+  position: relative;
+  margin-bottom: 22px;
+  z-index: 2;
+}
+
+/* Node Dot & Date Header */
+.timeline-node-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  position: relative;
+}
+
+.timeline-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #94a3b8;
+  border: 2px solid #f8f9fa;
+  flex-shrink: 0;
+  z-index: 3;
+}
+
+.today-dot {
+  background-color: #f59e0b;
+  box-shadow: 0 0 0 2px rgba(245, 158, 11, 0.25);
+}
+
+.overdue-dot {
+  background-color: #ef4444;
+  box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.25);
+}
+
+.completed-dot {
+  background-color: #10b981;
+}
+
+.timeline-date-label {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.timeline-date-bold {
+  font-size: 15px;
+  font-weight: 800;
+  color: #111827;
+  letter-spacing: -0.2px;
+}
+
+.timeline-weekday {
+  font-size: 14px;
+  font-weight: 500;
+  color: #9ca3af;
+}
+
+.overdue-text {
+  color: #dc2626 !important;
+}
+
+/* Completed Toggle Pill */
+.completed-toggle {
+  cursor: pointer;
+}
+
+.timeline-toggle-pill {
+  margin-left: auto;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background-color: #e5e7eb;
+  color: #4b5563;
+  transition: background 0.15s;
+}
+
+.completed-toggle:hover .timeline-toggle-pill {
+  background-color: #d1d5db;
+}
+
+/* Cards Container under the Node */
+.timeline-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding-left: 22px; /* Indent under the spine line */
+}
+
+/* ==========================================================================
+   Luma-style Timeline Card
+   ========================================================================== */
+.timeline-card {
+  background-color: #ffffff;
+  border: 1px solid #eef0f3;
+  border-radius: 16px;
+  padding: 14px 14px 14px 16px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.03), 0 2px 8px rgba(0, 0, 0, 0.02);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.timeline-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+  border-color: #cbd5e1;
+}
+
+.timeline-card.is-completed {
+  opacity: 0.6;
+  background-color: #fcfcfc;
+}
+
+.timeline-card.is-completed .timeline-card-title {
+  text-decoration: line-through;
+  color: #9ca3af;
+}
+
+/* Card Left Column */
+.timeline-card-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.timeline-card-top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 2px;
+}
+
+.timeline-card-time {
+  font-size: 12.5px;
+  font-weight: 500;
+  color: #6b7280;
+}
+
+.timeline-checkbox-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.timeline-checkbox {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--uw-gold-dark);
+  cursor: pointer;
+  border-radius: 4px;
+}
+
+.timeline-card-title {
+  font-size: 14.5px;
+  font-weight: 700;
+  color: #111827;
+  line-height: 1.35;
+  margin-bottom: 5px;
+  white-space: normal;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.timeline-card-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #6b7280;
+  margin-bottom: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.timeline-card-meta.location {
+  color: #9ca3af;
+  margin-bottom: 8px;
+}
+
+.meta-icon {
+  font-size: 11px;
+  opacity: 0.8;
+}
+
+.meta-text {
+  font-weight: 500;
+}
+
+/* Pill Badges Row (like CA$30 badge in reference) */
+.timeline-card-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.status-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2.5px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.2px;
+  display: inline-flex;
+  align-items: center;
+}
+
+.pill-quiz {
+  background-color: #fef3c7;
+  color: #b45309;
+}
+
+.pill-dropbox {
+  background-color: #eff6ff;
+  color: #1d4ed8;
+}
+
+.pill-today {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.pill-tomorrow {
+  background-color: #ffedd5;
+  color: #c2410c;
+}
+
+.pill-completed {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+/* ==========================================================================
+   Card Right: Visual Course Thumbnail (matching reference right-side image)
+   ========================================================================== */
+.timeline-card-thumb {
+  width: 66px;
+  height: 66px;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.timeline-card-thumb:hover {
+  transform: scale(1.04);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+}
+
+.thumb-quiz {
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 60%, #fde68a 100%);
+  border: 1px solid #fde68a;
+}
+
+.thumb-dropbox {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 60%, #bae6fd 100%);
+  border: 1px solid #bae6fd;
+}
+
+.thumb-subj {
+  font-size: 13px;
+  font-weight: 800;
+  color: #1e293b;
+  letter-spacing: -0.3px;
+  line-height: 1.1;
+}
+
+.thumb-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: #475569;
+  line-height: 1.1;
+}
+
+.thumb-icon {
+  position: absolute;
+  bottom: 3px;
+  right: 5px;
+  font-size: 10px;
+  color: #64748b;
+  font-weight: 700;
+}
+
+/* Empty State */
+.timeline-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  text-align: center;
+}
+
+.timeline-empty-icon {
+  font-size: 40px;
+  margin-bottom: 12px;
+}
+
+.timeline-empty-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: #111827;
+  margin-bottom: 4px;
+}
+
+.timeline-empty-desc {
+  font-size: 13px;
+  color: #6b7280;
+  line-height: 1.45;
+}
+
+/* ==========================================================================
+   Dark Mode Support
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  body.popup-mode,
+  .popup-container,
+  .popup-header {
+    background-color: #0f1117;
+  }
+
+  .popup-title {
+    color: #f9fafb;
+  }
+
+  .popup-count-badge {
+    background-color: #374151;
+    color: #e5e7eb;
+  }
+
+  .popup-actions .btn-pill {
+    background-color: #1f2937;
+    border-color: #374151;
+    color: #d1d5db;
+  }
+
+  .popup-actions .btn-pill:hover {
+    background-color: #374151;
+    color: #ffffff;
+  }
+
+  .timeline-spine {
+    background-color: #27272a;
+  }
+
+  .timeline-dot {
+    border-color: #0f1117;
+    background-color: #52525b;
+  }
+
+  .timeline-date-bold {
+    color: #f9fafb;
+  }
+
+  .timeline-card {
+    background-color: #181b23;
+    border-color: #262b38;
+  }
+
+  .timeline-card:hover {
+    border-color: #3b4254;
+  }
+
+  .timeline-card-title {
+    color: #f9fafb;
+  }
+
+  .timeline-card-time {
+    color: #9ca3af;
+  }
+
+  .thumb-quiz {
+    background: linear-gradient(135deg, #2a2215 0%, #3d2e14 100%);
+    border-color: #574116;
+  }
+
+  .thumb-quiz .thumb-subj {
+    color: #fde68a;
+  }
+
+  .thumb-quiz .thumb-num {
+    color: #fcd34d;
+  }
+
+  .thumb-dropbox {
+    background: linear-gradient(135deg, #132438 0%, #173252 100%);
+    border-color: #1e4570;
+  }
+
+  .thumb-dropbox .thumb-subj {
+    color: #93c5fd;
+  }
+
+  .thumb-dropbox .thumb-num {
+    color: #bfdbfe;
+  }
+}

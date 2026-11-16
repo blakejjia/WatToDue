@@ -1,96 +1,111 @@
-import { NavRail } from './src/components/nav-rail.js';
-import { CalendarView } from './src/components/calendar-view.js';
-import { GradesView } from './src/components/grades-view.js';
-import { SettingsView } from './src/components/settings-view.js';
+import { PopupDueList } from './src/components/popup-due-list.js';
 import { syncService } from './src/services/sync-service.js';
 import { storageManager } from './src/services/storage-manager.js';
 import { el, clear } from './src/utils/dom.js';
 
-class AppController {
-  constructor(isPopup = true) {
-    this.isPopup = isPopup;
-    this.currentTab = 'dues';
-    this.user = null;
-    this.terms = [];
-    this.selectedTerm = null;
-    this.courses = [];
+class PopupController {
+  constructor() {
     this.dues = [];
-    this.grades = {};
-    this.lastSync = null;
+    this.user = null;
+    this.dueList = null;
 
-    this.navRailEl = document.getElementById('nav-rail');
-    this.viewTitleEl = document.getElementById('view-title');
-    this.viewBodyEl = document.getElementById('view-body');
+    this.popupBodyEl = document.getElementById('popup-body');
+    this.countBadgeEl = document.getElementById('popup-count-badge');
+    this.syncBtn = document.getElementById('sync-quick-btn');
+    this.openFullBtn = document.getElementById('open-full-btn');
     this.bannerContainerEl = document.getElementById('banner-container');
-    this.syncQuickBtn = document.getElementById('sync-quick-btn');
 
     this.init();
   }
 
   async init() {
-    this.navRail = new NavRail(this.navRailEl, {
-      activeTab: this.currentTab,
-      isPopup: this.isPopup,
-      onTabChange: (tab) => this.switchTab(tab),
-      onExpand: () => {
+    // Open full dashboard in a new tab
+    if (this.openFullBtn) {
+      this.openFullBtn.addEventListener('click', () => {
         if (typeof chrome !== 'undefined' && chrome.tabs) {
           chrome.tabs.create({ url: chrome.runtime.getURL('index.html') });
-        }
-      },
-    });
-
-    if (this.syncQuickBtn) {
-      this.syncQuickBtn.addEventListener('click', () => this.triggerSync(true));
-    }
-
-    // Listen to storage changes for instant cross-tab/popup sync
-    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
-      chrome.storage.onChanged.addListener(async (changes, area) => {
-        if (area === 'local') {
-          await this.loadCache();
-          this.renderCurrentView();
+        } else {
+          window.open('index.html', '_blank');
         }
       });
     }
 
-    // 1. Load cached data immediately (instant 0ms render)
-    await this.loadCache();
-    this.renderCurrentView();
+    // Refresh sync button
+    if (this.syncBtn) {
+      this.syncBtn.addEventListener('click', () => this.triggerSync(true));
+    }
 
-    // 2. Perform lazy sync check in background
+    // Cross-tab live sync via chrome.storage.onChanged
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
+      chrome.storage.onChanged.addListener(async (changes, area) => {
+        if (area === 'local') {
+          await this.loadCache();
+          this.renderList();
+        }
+      });
+    }
+
+    // 1. Instant 0ms cache render
+    await this.loadCache();
+    this.renderList();
+
+    // 2. Background fresh sync check
     this.triggerSync(false);
   }
 
   async loadCache() {
     this.user = await storageManager.get('user', null);
-    this.terms = await storageManager.get('terms', []);
-    this.selectedTerm = await storageManager.get('selectedTerm', null);
-    this.courses = await storageManager.get('courses', []);
-    
-    // Overlay completed IDs onto dues
     const completedIds = new Set((await storageManager.get('completedDueIds', [])) || []);
     const rawDues = (await storageManager.get('dues', [])) || [];
+
     this.dues = rawDues.map((d) => ({
       ...d,
       completed: completedIds.has(d.id) || Boolean(d.completed),
     }));
 
-    this.grades = await storageManager.get('grades', {});
-    this.lastSync = await storageManager.get('lastSync', null);
+    this.updateBadge();
+  }
+
+  updateBadge() {
+    if (!this.countBadgeEl) return;
+    const activeCount = this.dues.filter((d) => !d.completed).length;
+    this.countBadgeEl.textContent = `${activeCount} Due`;
+    if (activeCount === 0) {
+      this.countBadgeEl.style.backgroundColor = 'var(--success-color)';
+      this.countBadgeEl.style.color = '#fff';
+    } else {
+      this.countBadgeEl.style.backgroundColor = 'var(--uw-gold)';
+      this.countBadgeEl.style.color = '#000';
+    }
+  }
+
+  renderList() {
+    if (!this.dueList) {
+      this.dueList = new PopupDueList(this.popupBodyEl, {
+        dues: this.dues,
+        onToggleCompleted: async (dueId, completed) => {
+          await storageManager.toggleCompleted(dueId);
+          await this.loadCache();
+          this.updateBadge();
+        },
+      });
+    } else {
+      this.dueList.setDues(this.dues);
+    }
+    this.updateBadge();
   }
 
   async triggerSync(force = false) {
-    if (this.syncQuickBtn) {
-      this.syncQuickBtn.disabled = true;
-      this.syncQuickBtn.classList.add('loading');
-      this.syncQuickBtn.textContent = '...';
+    if (this.syncBtn) {
+      this.syncBtn.disabled = true;
+      this.syncBtn.textContent = '...';
     }
 
     try {
       const result = await syncService.sync({ force });
       if (!result.fresh || force) {
         await this.loadCache();
-        this.renderCurrentView();
+        this.renderList();
       }
       this.clearBanner();
     } catch (err) {
@@ -99,10 +114,9 @@ class AppController {
         this.showLoginBanner();
       }
     } finally {
-      if (this.syncQuickBtn) {
-        this.syncQuickBtn.disabled = false;
-        this.syncQuickBtn.classList.remove('loading');
-        this.syncQuickBtn.textContent = '↻';
+      if (this.syncBtn) {
+        this.syncBtn.disabled = false;
+        this.syncBtn.textContent = '↻';
       }
     }
   }
@@ -111,8 +125,8 @@ class AppController {
     clear(this.bannerContainerEl);
     const banner = el(
       'div',
-      { className: 'banner banner-warning' },
-      el('span', {}, '🔑 Please sign in to Waterloo LEARN to sync your dues.'),
+      { className: 'banner banner-warning', style: { margin: '8px 12px 0 12px' } },
+      el('span', {}, '🔑 Please log in to Waterloo LEARN.'),
       el(
         'a',
         {
@@ -120,6 +134,12 @@ class AppController {
           href: 'https://learn.uwaterloo.ca',
           target: '_blank',
           rel: 'noopener noreferrer',
+          onClick: (e) => {
+            if (typeof chrome !== 'undefined' && chrome.tabs) {
+              e.preventDefault();
+              chrome.tabs.create({ url: 'https://learn.uwaterloo.ca' });
+            }
+          },
         },
         'Sign In'
       )
@@ -130,44 +150,11 @@ class AppController {
   clearBanner() {
     clear(this.bannerContainerEl);
   }
-
-  switchTab(tab) {
-    this.currentTab = tab;
-    const titles = { dues: 'Dues Calendar', grades: 'Grades Breakdown', settings: 'Settings & Courses' };
-    this.viewTitleEl.textContent = titles[tab] || 'WatToDue';
-    this.renderCurrentView();
-  }
-
-  renderCurrentView() {
-    clear(this.viewBodyEl);
-
-    if (this.currentTab === 'dues') {
-      this.calendarView = new CalendarView(this.viewBodyEl, {
-        dues: this.dues,
-        onRefresh: () => this.triggerSync(true),
-      });
-    } else if (this.currentTab === 'grades') {
-      this.gradesView = new GradesView(this.viewBodyEl, {
-        courses: this.courses,
-        gradesMap: this.grades,
-      });
-    } else if (this.currentTab === 'settings') {
-      this.settingsView = new SettingsView(this.viewBodyEl, {
-        user: this.user,
-        terms: this.terms,
-        selectedTerm: this.selectedTerm,
-        courses: this.courses,
-        lastSync: this.lastSync,
-        onSyncTriggered: async () => this.triggerSync(true),
-        onTermChanged: async (newTerm) => {
-          this.selectedTerm = newTerm;
-          await this.triggerSync(true);
-        },
-      });
-    }
-  }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  new AppController(true);
-});
+// Bootstrap once DOM ready
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', () => new PopupController());
+} else {
+  new PopupController();
+}

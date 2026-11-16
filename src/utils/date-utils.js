@@ -136,3 +136,117 @@ export function getMonthMatrix(year, month) {
 
   return cells;
 }
+
+/**
+ * Extracts bold date and subtitle components matching timeline UI styling.
+ * @param {Date|string} date
+ * @param {Date|string} [refDate=new Date()]
+ * @returns {{ bold: string, subtitle: string, isToday: boolean, isOverdue: boolean }}
+ */
+export function getTimelineDateComponents(date, refDate = new Date()) {
+  const target = new Date(date);
+  const now = new Date(refDate);
+
+  const targetMidnight = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+  const nowMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const diffDays = Math.round((targetMidnight.getTime() - nowMidnight.getTime()) / (1000 * 60 * 60 * 24));
+  const monthDay = target.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  const weekday = target.toLocaleDateString([], { weekday: 'long' });
+
+  if (diffDays === 0) {
+    return { bold: 'Today', subtitle: `${weekday}, ${monthDay}`, isToday: true, isOverdue: false };
+  }
+  if (diffDays === 1) {
+    return { bold: 'Tomorrow', subtitle: `${weekday}, ${monthDay}`, isToday: false, isOverdue: false };
+  }
+  if (diffDays < 0) {
+    return { bold: monthDay, subtitle: `${weekday} (Overdue)`, isToday: false, isOverdue: true };
+  }
+  return { bold: monthDay, subtitle: weekday, isToday: false, isOverdue: false };
+}
+
+/**
+ * Returns a human-friendly header for a date group in the popup list view.
+ * @param {Date|string} date
+ * @param {Date|string} [refDate=new Date()]
+ * @returns {string}
+ */
+export function formatDateGroupHeader(date, refDate = new Date()) {
+  const target = new Date(date);
+  const now = new Date(refDate);
+
+  const targetMidnight = new Date(target.getFullYear(), target.getMonth(), target.getDate());
+  const nowMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+  const diffDays = Math.round((targetMidnight.getTime() - nowMidnight.getTime()) / (1000 * 60 * 60 * 24));
+  const monthDay = target.toLocaleDateString([], { month: 'short', day: 'numeric' });
+  const weekday = target.toLocaleDateString([], { weekday: 'short' });
+
+  if (diffDays === 0) return `Today · ${monthDay}`;
+  if (diffDays === 1) return `Tomorrow · ${monthDay}`;
+  if (diffDays === -1) return `Yesterday · ${monthDay}`;
+  if (diffDays < -1) return `${monthDay} · ${Math.abs(diffDays)} days ago`;
+  if (diffDays > 1 && diffDays <= 6) return `${weekday} · ${monthDay}`;
+
+  return `${weekday}, ${monthDay}`;
+}
+
+/**
+ * Groups an array of dues into chronological date buckets for the popup list view.
+ * @param {Array<object>} dues
+ * @returns {{ overdue: Array<object>, dateGroups: Array<{ dateKey: string, header: string, items: Array<object> }>, completed: Array<object> }}
+ */
+export function groupDuesByDate(dues, refDate = new Date()) {
+  const now = new Date(refDate);
+  const nowMidnight = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+
+  const overdue = [];
+  const completed = [];
+  const dateMap = new Map();
+
+  for (const due of dues || []) {
+    if (due.completed) {
+      completed.push(due);
+      continue;
+    }
+
+    const dueTime = new Date(due.dueDate);
+    const dueMidnight = new Date(dueTime.getFullYear(), dueTime.getMonth(), dueTime.getDate()).getTime();
+
+    if (dueMidnight < nowMidnight) {
+      overdue.push(due);
+    } else {
+      const dateKey = `${dueTime.getFullYear()}-${String(dueTime.getMonth() + 1).padStart(2, '0')}-${String(dueTime.getDate()).padStart(2, '0')}`;
+      if (!dateMap.has(dateKey)) {
+        dateMap.set(dateKey, {
+          dateKey,
+          sampleDate: dueTime,
+          items: [],
+        });
+      }
+      dateMap.get(dateKey).items.push(due);
+    }
+  }
+
+  // Sort date keys chronologically
+  const sortedKeys = Array.from(dateMap.keys()).sort();
+  const dateGroups = sortedKeys.map((key) => {
+    const group = dateMap.get(key);
+    // Sort items within each day by time
+    group.items.sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime());
+    return {
+      dateKey: key,
+      sampleDate: group.sampleDate,
+      header: formatDateGroupHeader(group.sampleDate, now),
+      components: getTimelineDateComponents(group.sampleDate, now),
+      items: group.items,
+    };
+  });
+
+  return {
+    overdue,
+    dateGroups,
+    completed,
+  };
+}

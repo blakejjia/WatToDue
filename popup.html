@@ -5,26 +5,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>WatToDue</title>
   <link rel="stylesheet" href="styles/variables.css">
-  <link rel="stylesheet" href="styles/layout.css">
-  <link rel="stylesheet" href="styles/components.css">
-  <link rel="stylesheet" href="styles/calendar.css">
-  <link rel="stylesheet" href="styles/grades.css">
+  <link rel="stylesheet" href="styles/popup.css">
 </head>
 <body class="popup-mode">
-  <div class="app-container">
-    <nav class="nav-rail" id="nav-rail"></nav>
-    <main class="main-content">
-      <header class="view-header">
-        <div class="view-title-group">
-          <h1 class="view-title" id="view-title">Dues</h1>
-        </div>
-        <div class="view-actions" id="view-actions">
-          <button class="btn btn-secondary btn-sm" id="sync-quick-btn" title="Refresh data">↻</button>
-        </div>
-      </header>
-      <div id="banner-container"></div>
-      <div class="view-body" id="view-body"></div>
-    </main>
+  <div class="popup-container">
+    <header class="popup-header">
+      <div class="popup-brand">
+        <h1 class="popup-title">Dues</h1>
+        <span class="popup-count-badge" id="popup-count-badge">0 Due</span>
+      </div>
+      <div class="popup-actions">
+        <button class="btn-pill" id="open-full-btn" title="Open Full Dashboard in new tab">
+          + Dashboard ↗
+        </button>
+        <button class="btn-pill btn-icon-only" id="sync-quick-btn" title="Refresh Waterloo LEARN data">
+          ↻
+        </button>
+      </div>
+    </header>
+    <div id="banner-container"></div>
+    <main class="popup-body" id="popup-body"></main>
   </div>
   <script type="module" src="popup.js"></script>
 </body>

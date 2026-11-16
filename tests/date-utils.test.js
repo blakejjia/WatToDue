@@ -1,6 +1,12 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { formatDueRelative, getMonthMatrix, isSameDay } from '../src/utils/date-utils.js';
+import {
+  formatDueRelative,
+  getMonthMatrix,
+  isSameDay,
+  getTimelineDateComponents,
+  groupDuesByDate,
+} from '../src/utils/date-utils.js';
 
 test('formatDueRelative handles today, tomorrow, and past dates', () => {
   const now = new Date(2026, 2, 20, 12, 0, 0);
@@ -28,4 +34,41 @@ test('getMonthMatrix returns standard 7-column matrix cells in local dates', () 
   assert.ok(cells.length === 35 || cells.length === 42);
   const currentMonthDays = cells.filter(c => c.isCurrentMonth);
   assert.strictEqual(currentMonthDays.length, 31);
+});
+
+test('getTimelineDateComponents formats bold date and subtitle matching reference style', () => {
+  const ref = new Date(2026, 10, 16, 12, 0, 0); // Nov 16, 2026 (Monday)
+
+  const today = getTimelineDateComponents(new Date(2026, 10, 16, 18, 0, 0), ref);
+  assert.strictEqual(today.bold, 'Today');
+  assert.ok(today.subtitle.includes('Nov 16'));
+
+  const tomorrow = getTimelineDateComponents(new Date(2026, 10, 17, 9, 30, 0), ref);
+  assert.strictEqual(tomorrow.bold, 'Tomorrow');
+
+  const future = getTimelineDateComponents(new Date(2026, 10, 19, 18, 0, 0), ref);
+  assert.strictEqual(future.bold, 'Nov 19');
+  assert.strictEqual(future.subtitle, 'Thursday');
+});
+
+test('groupDuesByDate buckets dues by date and separates completed & overdue', () => {
+  const ref = new Date(2026, 10, 16, 12, 0, 0); // Nov 16, 2026
+  const dues = [
+    { id: '1', dueDate: '2026-11-16T18:00:00Z', title: 'Due Today', completed: false },
+    { id: '2', dueDate: '2026-11-19T23:59:00Z', title: 'Due Nov 19', completed: false },
+    { id: '3', dueDate: '2026-11-10T23:59:00Z', title: 'Overdue Task', completed: false },
+    { id: '4', dueDate: '2026-11-16T20:00:00Z', title: 'Done Task', completed: true },
+  ];
+
+  const grouped = groupDuesByDate(dues, ref);
+
+  assert.strictEqual(grouped.overdue.length, 1);
+  assert.strictEqual(grouped.overdue[0].id, '3');
+
+  assert.strictEqual(grouped.completed.length, 1);
+  assert.strictEqual(grouped.completed[0].id, '4');
+
+  assert.strictEqual(grouped.dateGroups.length, 2);
+  assert.strictEqual(grouped.dateGroups[0].items[0].id, '1');
+  assert.strictEqual(grouped.dateGroups[1].items[0].id, '2');
 });
