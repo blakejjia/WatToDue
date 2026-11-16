@@ -93,3 +93,41 @@ test('D2LClient handles course dropboxes and quizzes', async () => {
   assert.strictEqual(quizzes.length, 1);
   assert.strictEqual(quizzes[0].Name, 'Quiz 1');
 });
+
+test('D2LClient extracts submitted dropboxes and completed quizzes from LEARN HTML', async () => {
+  const mockFetch = async (url) => {
+    if (url.includes('/dropbox/user/folders_list.d2l')) {
+      const sampleHtml = `
+        <table>
+          <tr><td><a href="/d2l/lms/dropbox/user/folders_history.d2l?db=555&ou=123">1 Submission</a></td></tr>
+          <tr><td><a href="/d2l/lms/dropbox/user/folder_submit_files.d2l?db=666&ou=123">Not Submitted</a></td></tr>
+        </table>
+      `;
+      return {
+        ok: true,
+        text: async () => sampleHtml,
+      };
+    }
+    if (url.includes('/quizzing/user/quizzes_list.d2l')) {
+      const sampleHtml = `
+        <table>
+          <tr><td><a onclick="GoToQuiz(777, true);">Declarations</a></td><td><label>2</label><label> / 3</label></td></tr>
+          <tr><td><a onclick="GoToQuiz(888, true);">Unattempted</a></td><td><label>0</label><label> / 1</label></td></tr>
+        </table>
+      `;
+      return {
+        ok: true,
+        text: async () => sampleHtml,
+      };
+    }
+  };
+
+  const client = new D2LClient({ fetchFn: mockFetch });
+  const submittedDb = await client.getSubmittedDropboxFolderIds(123);
+  assert.ok(submittedDb.has(555));
+  assert.ok(!submittedDb.has(666));
+
+  const completedQz = await client.getCompletedQuizIds(123);
+  assert.ok(completedQz.has(777));
+  assert.ok(!completedQz.has(888));
+});

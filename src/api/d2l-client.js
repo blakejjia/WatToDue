@@ -1,4 +1,4 @@
-import { Endpoints } from './endpoints.js';
+import { Endpoints, BASE_URL } from './endpoints.js';
 
 export class SessionExpiredError extends Error {
   constructor(message = 'Session expired or not logged in to Waterloo LEARN.') {
