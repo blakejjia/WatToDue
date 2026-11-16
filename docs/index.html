@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WatToDue — Waterloo LEARN Dues, Calendar & Grades Extension</title>
+  <meta name="description" content="The modern Chrome extension for University of Waterloo students. Consolidates assignments, quizzes, and grade feedback directly from Waterloo LEARN.">
+  <link rel="icon" type="image/png" href="../icons/icon-48.png">
+  <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <style>
+    :root {
+      --uw-gold: #f59e0b;
+      --uw-black: #09090b;
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 antialiased font-sans selection:bg-amber-400 selection:text-slate-950">
+
+  <!-- Navigation Bar -->
+  <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-950/80 border-b border-slate-800">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <img src="../icons/icon-48.png" alt="WatToDue Logo" width="36" height="36" class="rounded-xl shadow-md border border-amber-400/30">
+        <div>
+          <span class="text-lg font-black tracking-tight text-white">WatTo<span class="text-amber-400">Due</span></span>
+          <span class="hidden sm:inline-block text-[11px] font-semibold px-2 py-0.5 ml-2 rounded-full bg-amber-400/10 text-amber-300 border border-amber-400/20">v1.0.0</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-4 text-sm font-medium">
+        <a href="#features" class="hidden md:inline-block text-slate-400 hover:text-white transition-colors">Features</a>
+        <a href="#screenshots" class="hidden md:inline-block text-slate-400 hover:text-white transition-colors">Screenshots</a>
+        <a href="#install" class="hidden md:inline-block text-slate-400 hover:text-white transition-colors">Install</a>
+        <a href="https://github.com/blakejjia/WatToDue" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-all flex items-center gap-2">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          <span>GitHub</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="relative pt-20 pb-16 overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-amber-500/15 via-transparent to-transparent pointer-events-none"></div>
+
+    <div class="max-w-5xl mx-auto px-4 text-center relative z-10 space-y-6">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-semibold">
+        <span>✨ Built specifically for UWaterloo Warriors</span>
+      </div>
+
+      <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-[1.1]">
+        Never miss a deadline.<br>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500">WatToDue has you covered.</span>
+      </h1>
+
+      <p class="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 leading-relaxed">
+        WatToDue automatically consolidates all assignment dropboxes, quizzes, and grade feedback across your Waterloo LEARN courses into one clean, high-performance dashboard and toolbar popup.
+      </p>
+
+      <div class="flex items-center justify-center flex-wrap gap-4 pt-4">
+        <a href="https://github.com/blakejjia/WatToDue/releases/latest" target="_blank" rel="noopener noreferrer" class="px-6 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-sm shadow-lg shadow-amber-400/20 hover:shadow-amber-400/30 transition-all flex items-center gap-2">
+          <span>📦 Download Extension (ZIP)</span>
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+        </a>
+        <a href="#install" class="px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-bold text-sm transition-all">
+          Quick Setup Guide ➔
+        </a>
+      </div>
+
+      <!-- Hero Screenshot Showcase -->
+      <div class="pt-10 max-w-5xl mx-auto">
+        <div class="rounded-2xl border border-slate-700/80 bg-slate-900/60 p-2 sm:p-3 shadow-2xl backdrop-blur-xl">
+          <img src="assets/screenshots/dashboard-agenda.png" 
+               alt="WatToDue Dashboard Agenda View" 
+               fetchpriority="high" 
+               width="1280" height="600" 
+               class="rounded-xl border border-slate-800 w-full object-cover shadow-inner">
+        </div>
+        <div class="text-xs text-slate-400 mt-3 font-medium">
+          WatToDue Dashboard Agenda: Date-grouped timeline with side-by-side cards & auto-detected submissions
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Feature Highlights -->
+  <section id="features" class="py-16 border-t border-slate-800 bg-slate-900/30">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="text-center max-w-2xl mx-auto mb-14 space-y-3">
+        <h2 class="text-xs uppercase font-extrabold tracking-widest text-amber-400">Features</h2>
+        <p class="text-3xl font-black text-white">Engineered for how Waterloo students actually study</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Feature 1 -->
+        <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400 flex items-center justify-center font-bold text-xl">
+            📅
+          </div>
+          <h3 class="text-lg font-bold text-white">Consolidated Deadlines</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Eliminate tab switching. Syncs all assignments, dropboxes, and quizzes across all active Fall, Winter, and Spring terms.
+          </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-400/10 border border-emerald-400/20 text-emerald-400 flex items-center justify-center font-bold text-xl">
+            📊
+          </div>
+          <h3 class="text-lg font-bold text-white">True Grade Standing</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Organized in the exact Waterloo LEARN category tree. Unmarked future assessments (0%) are masked as Ungraded so your real average shines.
+          </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-400/10 border border-blue-400/20 text-blue-400 flex items-center justify-center font-bold text-xl">
+            🔬
+          </div>
+          <h3 class="text-lg font-bold text-white">Lab & Lecture Recognition</h3>
+          <p class="text-sm text-slate-400 leading-relaxed">
+            Automatically differentiates Lectures (LEC), Laboratories (LAB like CHEM 220L), Tutorials (TUT), and Tests (TST).
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Screenshot Gallery Section -->
+  <section id="screenshots" class="py-16 border-t border-slate-800">
+    <div class="max-w-6xl mx-auto px-4 space-y-12">
+      <div class="text-center max-w-2xl mx-auto space-y-3">
+        <h2 class="text-xs uppercase font-extrabold tracking-widest text-amber-400">Visual Tour</h2>
+        <p class="text-3xl font-black text-white">Clean, elegant, and fast</p>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
+        <!-- Monthly Calendar -->
+        <div class="space-y-4">
+          <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-2 shadow-xl">
+            <img src="assets/screenshots/dashboard-calendar.png" 
+                 alt="Monthly Calendar Matrix" 
+                 loading="lazy" 
+                 width="640" height="400" 
+                 class="rounded-xl border border-slate-800/80 w-full object-cover">
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white">Monthly Calendar Matrix with Day Flyouts</h3>
+            <p class="text-sm text-slate-400 mt-1">
+              Select any date with due indicators to inspect side-by-side cards, exact submission times, and deep links.
+            </p>
+          </div>
+        </div>
+
+        <!-- Quick Toolbar Popup -->
+        <div class="space-y-4">
+          <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-2 shadow-xl flex justify-center">
+            <img src="assets/screenshots/popup-view.jpg" 
+                 alt="Quick Toolbar Popup" 
+                 loading="lazy" 
+                 width="420" height="500" 
+                 class="rounded-xl border border-slate-800/80 max-h-[400px] object-contain">
+          </div>
+          <div>
+            <h3 class="text-lg font-bold text-white">1-Click Quick Popup</h3>
+            <p class="text-sm text-slate-400 mt-1">
+              Stay on top of what is due next without opening a new tab. Check off finished tasks or jump directly to the submission folder.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grades Breakdown Full Width -->
+      <div class="space-y-4 pt-6">
+        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-2 shadow-xl">
+          <img src="assets/screenshots/grades-breakdown.png" 
+               alt="Waterloo LEARN Grade Breakdown" 
+               loading="lazy" 
+               width="1280" height="500" 
+               class="rounded-xl border border-slate-800/80 w-full object-cover">
+        </div>
+        <div>
+          <h3 class="text-lg font-bold text-white">Collapsible Categories & Direct Quiz Attempts Links</h3>
+          <p class="text-sm text-slate-400 mt-1">
+            Browse Problem Sets, Tests, and Reflections nested neatly under category folders with real-time weights and direct links to view quiz attempts.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation Guide -->
+  <section id="install" class="py-16 border-t border-slate-800 bg-slate-900/40">
+    <div class="max-w-4xl mx-auto px-4 space-y-8">
+      <div class="text-center space-y-3">
+        <h2 class="text-xs uppercase font-extrabold tracking-widest text-amber-400">Installation</h2>
+        <p class="text-3xl font-black text-white">Set up in 30 seconds</p>
+        <p class="text-sm text-slate-400">No developer skills required. Just download and load.</p>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Step 1 -->
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-4">
+          <div class="w-8 h-8 rounded-full bg-amber-400/20 text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">1</div>
+          <div>
+            <h4 class="font-bold text-white text-base">Download the Extension Package</h4>
+            <p class="text-sm text-slate-400 mt-1">
+              Download the latest <a href="https://github.com/blakejjia/WatToDue/releases/latest" class="text-amber-400 underline hover:text-amber-300">WatToDue.zip release</a> and unzip it to a folder on your computer.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-4">
+          <div class="w-8 h-8 rounded-full bg-amber-400/20 text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">2</div>
+          <div>
+            <h4 class="font-bold text-white text-base">Open Chrome Extensions</h4>
+            <p class="text-sm text-slate-400 mt-1">
+              In Google Chrome, navigate to <code class="px-2 py-0.5 rounded bg-slate-800 text-amber-300 font-mono text-xs">chrome://extensions</code> and toggle <strong>Developer mode</strong> in the top-right corner.
+            </p>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-4">
+          <div class="w-8 h-8 rounded-full bg-amber-400/20 text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">3</div>
+          <div>
+            <h4 class="font-bold text-white text-base">Click "Load unpacked"</h4>
+            <p class="text-sm text-slate-400 mt-1">
+              Click the <strong>Load unpacked</strong> button and select the unzipped WatToDue folder. Pin WatToDue to your toolbar and log in to <a href="https://learn.uwaterloo.ca" target="_blank" class="text-amber-400 underline hover:text-amber-300">Waterloo LEARN</a>!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Privacy & Footer -->
+  <footer class="py-12 border-t border-slate-800 text-center text-xs text-slate-500 space-y-4">
+    <div class="flex items-center justify-center gap-6 text-slate-400 font-medium">
+      <a href="https://github.com/blakejjia/WatToDue" class="hover:text-amber-400 transition-colors">GitHub Repository</a>
+      <a href="https://learn.uwaterloo.ca" target="_blank" class="hover:text-amber-400 transition-colors">Waterloo LEARN</a>
+      <a href="https://github.com/blakejjia/WatToDue/blob/main/LICENSE" class="hover:text-amber-400 transition-colors">MIT License</a>
+    </div>
+    <p>
+      🔒 <strong>Privacy Guarantee</strong>: WatToDue runs 100% locally in your browser. No credentials, tokens, or personal student data are ever collected or sent to external servers.
+    </p>
+    <p>© 2026 WatToDue. Built with 💛 for University of Waterloo students.</p>
+  </footer>
+
+</body>
+</html>
