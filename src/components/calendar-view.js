@@ -22,6 +22,7 @@ export class CalendarView {
     this.currentMonth = now.getMonth(); // 0-indexed
     this.selectedDayDues = null;
     this.selectedDayStr = null;
+    this.selectedDate = null;
 
     this.render();
   }
@@ -284,15 +285,24 @@ export class CalendarView {
       const cellDues = this.dues.filter((d) => isSameDay(d.dueDate, cell.date));
       const hasDues = cellDues.length > 0;
       const isToday = isSameDay(cell.date, now);
+      const isSelected = Boolean(this.selectedDate && isSameDay(cell.date, this.selectedDate));
 
       const cellEl = el(
         'div',
         {
-          className: `calendar-cell ${cell.isCurrentMonth ? '' : 'other-month'} ${isToday ? 'is-today' : ''} ${hasDues ? 'has-dues' : ''}`,
+          className: `calendar-cell ${cell.isCurrentMonth ? '' : 'other-month'} ${isToday ? 'is-today' : ''} ${hasDues ? 'has-dues' : ''} ${isSelected ? 'is-selected' : ''}`,
           onClick: () => {
             if (hasDues) {
-              this.selectedDayDues = cellDues;
-              this.selectedDayStr = cell.date.toLocaleDateString([], { month: 'short', day: 'numeric', weekday: 'short' });
+              if (this.selectedDate && isSameDay(cell.date, this.selectedDate)) {
+                // Toggle off if already selected
+                this.selectedDate = null;
+                this.selectedDayDues = null;
+                this.selectedDayStr = null;
+              } else {
+                this.selectedDate = cell.date;
+                this.selectedDayDues = cellDues;
+                this.selectedDayStr = cell.date.toLocaleDateString([], { month: 'short', day: 'numeric', weekday: 'short' });
+              }
               this.render();
             }
           },
@@ -320,20 +330,54 @@ export class CalendarView {
       const flyoutTitle = el(
         'div',
         { className: 'flyout-title' },
-        el('span', {}, `Dues on ${this.selectedDayStr} (${this.selectedDayDues.length})`),
-        el('button', {
-          className: 'btn btn-secondary btn-sm',
-          onClick: () => {
-            this.selectedDayDues = null;
-            this.render();
-          },
-        }, '✕')
+        el(
+          'div',
+          { style: { display: 'flex', alignItems: 'center', gap: '8px' } },
+          el('span', { className: 'timeline-dot today-dot', style: { width: '10px', height: '10px' } }),
+          el('strong', { style: { fontSize: '15px', color: 'var(--text-primary)' } }, `Dues on ${this.selectedDayStr}`),
+          el('span', { className: 'status-pill pill-quiz' }, `${this.selectedDayDues.length} Due${this.selectedDayDues.length > 1 ? 's' : ''}`)
+        ),
+        el(
+          'div',
+          { style: { display: 'flex', alignItems: 'center', gap: '8px' } },
+          el(
+            'button',
+            {
+              className: 'btn btn-secondary btn-sm',
+              title: 'Switch to Agenda view',
+              onClick: () => {
+                this.viewMode = 'agenda';
+                this.render();
+              },
+            },
+            'View in Agenda ↗'
+          ),
+          el(
+            'button',
+            {
+              className: 'btn btn-secondary btn-sm',
+              title: 'Close details',
+              onClick: () => {
+                this.selectedDate = null;
+                this.selectedDayDues = null;
+                this.selectedDayStr = null;
+                this.render();
+              },
+            },
+            '✕'
+          )
+        )
       );
       flyout.appendChild(flyoutTitle);
 
-      const flyoutGrid = el('div', { className: 'timeline-cards-grid', style: { paddingLeft: '0' } });
+      const flyoutGrid = el('div', { className: 'timeline-cards-grid', style: { paddingLeft: '0', marginTop: '12px' } });
       for (const item of this.selectedDayDues) {
-        flyoutGrid.appendChild(this.createDueCard(item, now));
+        flyoutGrid.appendChild(createTimelineCard(item, now, async (dueId, completed) => {
+          item.completed = completed;
+          await storageManager.toggleCompleted(dueId);
+          this.render();
+          if (this.onRefresh) this.onRefresh();
+        }));
       }
       flyout.appendChild(flyoutGrid);
       container.appendChild(flyout);

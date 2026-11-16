@@ -451,6 +451,13 @@
   background-color: var(--uw-gold-light);
 }
 
+.calendar-cell.is-selected {
+  border-color: var(--uw-gold-dark, #d4a017) !important;
+  background-color: #fef9c3 !important;
+  box-shadow: 0 0 0 2px var(--uw-gold);
+  font-weight: 800;
+}
+
 .calendar-cell.has-dues {
   font-weight: 600;
 }
@@ -515,6 +522,10 @@
   }
   .timeline-card.is-completed {
     background-color: #12141a;
+  }
+  .calendar-cell.is-selected {
+    background-color: rgba(253, 213, 79, 0.22) !important;
+    border-color: var(--uw-gold) !important;
   }
   .timeline-card-title {
     color: #f3f4f6;
