@@ -167,7 +167,7 @@ export class SyncService {
     const { force = false } = options;
 
     const lastSync = await storageManager.get('lastSync', null);
-    const ttlMinutes = await storageManager.get('cacheTtlMinutes', 30);
+    const ttlMinutes = await storageManager.get('cacheTtlMinutes', 2);
     const ttlMs = ttlMinutes * 60 * 1000;
 
     if (!force && lastSync && Date.now() - new Date(lastSync).getTime() < ttlMs) {

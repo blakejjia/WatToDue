@@ -50,7 +50,7 @@ class PopupController {
     this.renderList();
 
     // 2. Background fresh sync check
-    this.triggerSync(false);
+    this.triggerSync(true);
   }
 
   async loadCache() {

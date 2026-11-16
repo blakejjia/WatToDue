@@ -52,7 +52,7 @@ class DashboardController {
     this.renderCurrentView();
 
     // 2. Background fresh sync
-    this.triggerSync(false);
+    this.triggerSync(true);
   }
 
   async loadCache() {
