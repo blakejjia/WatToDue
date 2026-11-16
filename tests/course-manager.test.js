@@ -1,6 +1,54 @@
 import { test } from 'node:test';
 import assert from 'node:assert';
-import { parseCourseOffering, groupCoursesByTerm } from '../src/services/course-manager.js';
+import { parseCourseOffering, groupCoursesByTerm, determineCourseComponent } from '../src/services/course-manager.js';
+
+test('parseCourseOffering accurately classifies Waterloo laboratory courses (CHEM 220L)', () => {
+  const labItem = {
+    OrgUnit: {
+      Id: 1291911,
+      Name: 'CHEM 220L - Fall 2026',
+      Code: 'CHEM220L_sblavery_1269',
+      Type: { Code: 'Course Offering' }
+    },
+    Access: { IsActive: true }
+  };
+  const course = parseCourseOffering(labItem);
+  assert.ok(course);
+  assert.strictEqual(course.subject, 'CHEM');
+  assert.strictEqual(course.catalogNumber, '220L');
+  assert.strictEqual(course.component, 'LAB');
+  assert.strictEqual(course.defaultEnabled, true);
+  assert.strictEqual(course.termCode, '1269');
+});
+
+test('parseCourseOffering classifies Waterloo lecture courses (CHEM 220)', () => {
+  const lecItem = {
+    OrgUnit: {
+      Id: 1291906,
+      Name: 'CHEM 220 - Fall 2026',
+      Code: 'CHEM220_sblavery_1269',
+      Type: { Code: 'Course Offering' }
+    },
+    Access: { IsActive: true }
+  };
+  const course = parseCourseOffering(lecItem);
+  assert.ok(course);
+  assert.strictEqual(course.subject, 'CHEM');
+  assert.strictEqual(course.catalogNumber, '220');
+  assert.strictEqual(course.component, 'LEC');
+  assert.strictEqual(course.defaultEnabled, true);
+});
+
+test('determineCourseComponent handles suffixes and explicit keywords', () => {
+  assert.strictEqual(determineCourseComponent({ catalogNumber: '220L' }), 'LAB');
+  assert.strictEqual(determineCourseComponent({ catalogNumber: '240L' }), 'LAB');
+  assert.strictEqual(determineCourseComponent({ catalogNumber: '135L' }), 'LAB');
+  assert.strictEqual(determineCourseComponent({ catalogNumber: '101R' }), 'TUT');
+  assert.strictEqual(determineCourseComponent({ name: 'MATH 135 TUT - Fall 2026' }), 'TUT');
+  assert.strictEqual(determineCourseComponent({ name: 'CS 135 TST - Fall 2026' }), 'TST');
+  assert.strictEqual(determineCourseComponent({ catalogNumber: '439' }), 'LEC');
+  assert.strictEqual(determineCourseComponent({ explicitComponent: 'LAB' }), 'LAB');
+});
 
 test('parseCourseOffering parses course details and components', () => {
   const item = {

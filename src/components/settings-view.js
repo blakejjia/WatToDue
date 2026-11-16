@@ -266,9 +266,14 @@ export class SettingsView {
         },
       });
 
-      const componentBadgeClass = course.component === 'LEC'
-        ? 'badge-assignment'
-        : (course.component === 'LAB' ? 'badge-quiz' : 'badge-overdue');
+      const componentBadgeClass = {
+        LEC: 'badge-assignment',
+        LAB: 'badge-lab',
+        TUT: 'badge-tut',
+        PRJ: 'badge-prj',
+        SEM: 'badge-sem',
+        TST: 'badge-overdue',
+      }[course.component] || 'badge-assignment';
 
       const itemRow = el(
         'label',
