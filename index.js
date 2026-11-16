@@ -37,6 +37,16 @@ class DashboardController {
       this.syncQuickBtn.addEventListener('click', () => this.triggerSync(true));
     }
 
+    // Listen to storage changes for instant cross-tab/popup sync
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
+      chrome.storage.onChanged.addListener(async (changes, area) => {
+        if (area === 'local') {
+          await this.loadCache();
+          this.renderCurrentView();
+        }
+      });
+    }
+
     // 1. Instant render from local storage
     await this.loadCache();
     this.renderCurrentView();
@@ -50,7 +60,15 @@ class DashboardController {
     this.terms = await storageManager.get('terms', []);
     this.selectedTerm = await storageManager.get('selectedTerm', null);
     this.courses = await storageManager.get('courses', []);
-    this.dues = await storageManager.get('dues', []);
+
+    // Overlay completed IDs onto dues
+    const completedIds = new Set((await storageManager.get('completedDueIds', [])) || []);
+    const rawDues = (await storageManager.get('dues', [])) || [];
+    this.dues = rawDues.map((d) => ({
+      ...d,
+      completed: completedIds.has(d.id),
+    }));
+
     this.grades = await storageManager.get('grades', {});
     this.lastSync = await storageManager.get('lastSync', null);
   }
@@ -58,7 +76,8 @@ class DashboardController {
   async triggerSync(force = false) {
     if (this.syncQuickBtn) {
       this.syncQuickBtn.disabled = true;
-      this.syncQuickBtn.querySelector('span:first-child').classList.add('spinner');
+      const spinnerSpan = this.syncQuickBtn.querySelector('span:first-child');
+      if (spinnerSpan) spinnerSpan.classList.add('spinner');
     }
 
     try {
@@ -76,7 +95,8 @@ class DashboardController {
     } finally {
       if (this.syncQuickBtn) {
         this.syncQuickBtn.disabled = false;
-        this.syncQuickBtn.querySelector('span:first-child').classList.remove('spinner');
+        const spinnerSpan = this.syncQuickBtn.querySelector('span:first-child');
+        if (spinnerSpan) spinnerSpan.classList.remove('spinner');
       }
     }
   }

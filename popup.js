@@ -43,6 +43,16 @@ class AppController {
       this.syncQuickBtn.addEventListener('click', () => this.triggerSync(true));
     }
 
+    // Listen to storage changes for instant cross-tab/popup sync
+    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
+      chrome.storage.onChanged.addListener(async (changes, area) => {
+        if (area === 'local') {
+          await this.loadCache();
+          this.renderCurrentView();
+        }
+      });
+    }
+
     // 1. Load cached data immediately (instant 0ms render)
     await this.loadCache();
     this.renderCurrentView();
@@ -56,7 +66,15 @@ class AppController {
     this.terms = await storageManager.get('terms', []);
     this.selectedTerm = await storageManager.get('selectedTerm', null);
     this.courses = await storageManager.get('courses', []);
-    this.dues = await storageManager.get('dues', []);
+    
+    // Overlay completed IDs onto dues
+    const completedIds = new Set((await storageManager.get('completedDueIds', [])) || []);
+    const rawDues = (await storageManager.get('dues', [])) || [];
+    this.dues = rawDues.map((d) => ({
+      ...d,
+      completed: completedIds.has(d.id),
+    }));
+
     this.grades = await storageManager.get('grades', {});
     this.lastSync = await storageManager.get('lastSync', null);
   }

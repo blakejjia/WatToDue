@@ -73,22 +73,38 @@ export class GradesView {
     const selectedCourse = this.courses.find((c) => c.id === this.selectedCourseId) || this.courses[0];
     const gradeItems = this.gradesMap[selectedCourse.id] || [];
 
-    // Summary Card
-    let earnedNumerator = 0;
-    let earnedDenominator = 0;
+    // Summary Card: prefers weighted calculation if available
+    let totalWeightedScore = 0;
+    let totalWeightedMax = 0;
+    let hasWeighted = false;
+
+    let totalRawScore = 0;
+    let totalRawMax = 0;
     let scoredItemsCount = 0;
 
     for (const item of gradeItems) {
+      if (typeof item.weightedScore === 'number' && typeof item.weightedMax === 'number' && item.weightedMax > 0) {
+        totalWeightedScore += item.weightedScore;
+        totalWeightedMax += item.weightedMax;
+        hasWeighted = true;
+      }
       if (typeof item.score === 'number' && typeof item.maxScore === 'number' && item.maxScore > 0) {
-        earnedNumerator += item.score;
-        earnedDenominator += item.maxScore;
+        totalRawScore += item.score;
+        totalRawMax += item.maxScore;
         scoredItemsCount++;
       }
     }
 
-    const overallPercent = earnedDenominator > 0
-      ? Math.round((earnedNumerator / earnedDenominator) * 1000) / 10
-      : null;
+    let overallPercent = null;
+    let scoreLabel = '';
+
+    if (hasWeighted && totalWeightedMax > 0) {
+      overallPercent = Math.round((totalWeightedScore / totalWeightedMax) * 1000) / 10;
+      scoreLabel = `${totalWeightedScore.toFixed(1)} / ${totalWeightedMax.toFixed(1)} weighted pts (${overallPercent}%)`;
+    } else if (totalRawMax > 0) {
+      overallPercent = Math.round((totalRawScore / totalRawMax) * 1000) / 10;
+      scoreLabel = `${totalRawScore} / ${totalRawMax} raw pts (${overallPercent}%)`;
+    }
 
     const summaryCard = el(
       'div',
@@ -110,7 +126,7 @@ export class GradesView {
         el(
           'div',
           { className: 'course-summary-items-count' },
-          `${scoredItemsCount} of ${gradeItems.length} graded`
+          scoreLabel ? scoreLabel : `${scoredItemsCount} of ${gradeItems.length} graded`
         )
       )
     );

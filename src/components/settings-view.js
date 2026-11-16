@@ -1,6 +1,5 @@
 import { el, clear } from '../utils/dom.js';
 import { storageManager } from '../services/storage-manager.js';
-import { syncService } from '../services/sync-service.js';
 
 export class SettingsView {
   /**
@@ -31,7 +30,7 @@ export class SettingsView {
   }
 
   async loadStateAndRender() {
-    this.enabledCourseIds = await storageManager.get('enabledCourseIds', null);
+    this.enabledCourseIds = await storageManager.getEnabledCoursesForTerm(this.selectedTerm);
     this.render();
   }
 
@@ -41,7 +40,7 @@ export class SettingsView {
     if (selectedTerm !== undefined) this.selectedTerm = selectedTerm;
     if (courses !== undefined) this.courses = courses;
     if (lastSync !== undefined) this.lastSync = lastSync;
-    this.render();
+    this.loadStateAndRender();
   }
 
   render() {
@@ -206,6 +205,7 @@ export class SettingsView {
         const newTerm = e.target.value;
         this.selectedTerm = newTerm;
         await storageManager.set('selectedTerm', newTerm);
+        this.enabledCourseIds = await storageManager.getEnabledCoursesForTerm(newTerm);
         await this.onTermChanged(newTerm);
       },
     });
@@ -260,7 +260,9 @@ export class SettingsView {
           }
 
           this.enabledCourseIds = Array.from(currentEnabled);
-          await storageManager.set('enabledCourseIds', this.enabledCourseIds);
+          await storageManager.setEnabledCoursesForTerm(this.selectedTerm, this.enabledCourseIds);
+          // Auto-trigger sync so Dues and Grades tabs update immediately
+          await this.onSyncTriggered();
         },
       });
 

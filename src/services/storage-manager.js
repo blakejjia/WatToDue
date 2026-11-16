@@ -61,7 +61,8 @@ class StorageManager {
   }
 
   /**
-   * Toggles completion status for a specific due ID.
+   * Toggles completion status for a specific due ID, persisting to both
+   * completedDueIds list and in-storage dues cache.
    * @param {string} dueId - e.g. "dropbox-101" or "quiz-202"
    * @returns {Promise<boolean>} New completion state
    */
@@ -77,6 +78,20 @@ class StorageManager {
       newState = true;
     }
     await this.set('completedDueIds', Array.from(set));
+
+    // Also update in-storage dues array so next cache load carries correct state
+    const dues = (await this.get('dues', [])) || [];
+    let updated = false;
+    for (const d of dues) {
+      if (d && d.id === dueId) {
+        d.completed = newState;
+        updated = true;
+      }
+    }
+    if (updated) {
+      await this.set('dues', dues);
+    }
+
     return newState;
   }
 
@@ -91,13 +106,35 @@ class StorageManager {
   }
 
   /**
+   * Gets enabled course IDs partitioned by academic term.
+   * @param {string} termCode
+   * @returns {Promise<number[]|null>}
+   */
+  async getEnabledCoursesForTerm(termCode) {
+    if (!termCode) return null;
+    const termMap = (await this.get('enabledCourseIdsByTerm', {})) || {};
+    return termMap[termCode] !== undefined ? termMap[termCode] : null;
+  }
+
+  /**
+   * Sets enabled course IDs for a specific academic term.
+   * @param {string} termCode
+   * @param {number[]} courseIds
+   */
+  async setEnabledCoursesForTerm(termCode, courseIds) {
+    if (!termCode) return;
+    const termMap = (await this.get('enabledCourseIdsByTerm', {})) || {};
+    termMap[termCode] = courseIds;
+    await this.set('enabledCourseIdsByTerm', termMap);
+  }
+
+  /**
    * Returns current user settings.
-   * @returns {Promise<{ activeTerm: string|null, enabledCourseIds: number[]|null, cacheTtlMinutes: number }>}
+   * @returns {Promise<{ activeTerm: string|null, cacheTtlMinutes: number }>}
    */
   async getSettings() {
     return {
       activeTerm: await this.get('selectedTerm', null),
-      enabledCourseIds: await this.get('enabledCourseIds', null),
       cacheTtlMinutes: await this.get('cacheTtlMinutes', 30),
     };
   }

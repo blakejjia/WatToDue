@@ -177,9 +177,9 @@ export class SyncService {
     const activeCourses = activeTermGroup ? activeTermGroup.courses : [];
     await storageManager.set('courses', activeCourses);
 
-    // Enabled courses
-    const enabledCourseIds = await storageManager.get('enabledCourseIds', null);
-    const targetCourses = enabledCourseIds
+    // Enabled courses partitioned by term
+    const enabledCourseIds = await storageManager.getEnabledCoursesForTerm(selectedTerm);
+    const targetCourses = enabledCourseIds !== null
       ? activeCourses.filter((c) => enabledCourseIds.includes(c.id))
       : activeCourses.filter((c) => c.defaultEnabled);
 
