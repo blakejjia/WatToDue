@@ -1,5 +1,6 @@
 import { el, clear } from '../utils/dom.js';
-import { groupDuesByDate, formatDueRelative } from '../utils/date-utils.js';
+import { groupDuesByDate } from '../utils/date-utils.js';
+import { createTimelineCard } from './timeline-card.js';
 
 export class PopupDueList {
   /**
@@ -54,6 +55,13 @@ export class PopupDueList {
     const spine = el('div', { className: 'timeline-spine' });
     timelineContainer.appendChild(spine);
 
+    const handleToggle = async (dueId, isChecked) => {
+      await this.onToggleCompleted(dueId, isChecked);
+      const item = this.dues.find((d) => d.id === dueId);
+      if (item) item.completed = isChecked;
+      this.render();
+    };
+
     // 1. Overdue Section (if any uncompleted past items exist)
     if (overdue.length > 0) {
       const overdueGroup = el('div', { className: 'timeline-group overdue' });
@@ -73,7 +81,7 @@ export class PopupDueList {
 
       const cardsContainer = el('div', { className: 'timeline-cards' });
       for (const item of overdue) {
-        cardsContainer.appendChild(this.createTimelineCard(item, now));
+        cardsContainer.appendChild(createTimelineCard(item, now, handleToggle));
       }
       overdueGroup.appendChild(cardsContainer);
       timelineContainer.appendChild(overdueGroup);
@@ -99,7 +107,7 @@ export class PopupDueList {
 
       const cardsContainer = el('div', { className: 'timeline-cards' });
       for (const item of group.items) {
-        cardsContainer.appendChild(this.createTimelineCard(item, now));
+        cardsContainer.appendChild(createTimelineCard(item, now, handleToggle));
       }
       groupEl.appendChild(cardsContainer);
       timelineContainer.appendChild(groupEl);
@@ -136,7 +144,7 @@ export class PopupDueList {
       if (this.showCompleted) {
         const cardsContainer = el('div', { className: 'timeline-cards' });
         for (const item of completed) {
-          cardsContainer.appendChild(this.createTimelineCard(item, now));
+          cardsContainer.appendChild(createTimelineCard(item, now, handleToggle));
         }
         completedGroup.appendChild(cardsContainer);
       }
@@ -145,115 +153,5 @@ export class PopupDueList {
 
     root.appendChild(timelineContainer);
     this.container.appendChild(root);
-  }
-
-  /**
-   * Generates a 2-3 letter subject abbreviation & number badge.
-   * @param {string} courseName
-   */
-  getCourseBadge(courseName = '') {
-    const clean = courseName.toUpperCase();
-    const match = clean.match(/([A-Z]{2,6})\s*(\d{2,3}[A-Z]?)/);
-    if (match) {
-      return { subj: match[1], num: match[2] };
-    }
-    const words = clean.split(/[\s-]+/).filter((w) => w.length > 0);
-    return {
-      subj: words[0]?.slice(0, 4) || 'UW',
-      num: words[1]?.slice(0, 3) || '',
-    };
-  }
-
-  createTimelineCard(due, now) {
-    const rel = formatDueRelative(due.dueDate, now);
-    const isQuiz = due.type === 'quiz';
-    const badgeData = this.getCourseBadge(due.courseName);
-
-    const checkbox = el('input', {
-      type: 'checkbox',
-      className: 'timeline-checkbox',
-      checked: Boolean(due.completed),
-      title: due.completed ? 'Mark uncompleted' : 'Mark completed',
-      onChange: async (e) => {
-        const checked = e.target.checked;
-        due.completed = checked;
-        await this.onToggleCompleted(due.id, checked);
-        this.render();
-      },
-    });
-
-    // Left info section
-    const timeEl = el('div', { className: 'timeline-card-time' }, rel.timeStr);
-    const titleEl = el('div', { className: 'timeline-card-title', title: due.title }, due.title);
-
-    const courseLine = el(
-      'div',
-      { className: 'timeline-card-meta' },
-      el('span', { className: 'meta-icon' }, '📚'),
-      el('span', { className: 'meta-text' }, due.courseName)
-    );
-
-    const locationLine = el(
-      'div',
-      { className: 'timeline-card-meta location' },
-      el('span', { className: 'meta-icon' }, '📍'),
-      el('span', { className: 'meta-text' }, isQuiz ? 'Waterloo LEARN Quiz' : 'LEARN Drop Box')
-    );
-
-    const pillsRow = el(
-      'div',
-      { className: 'timeline-card-pills' },
-      el(
-        'span',
-        { className: `status-pill ${isQuiz ? 'pill-quiz' : 'pill-dropbox'}` },
-        isQuiz ? 'Quiz' : 'Dropbox'
-      ),
-      rel.status === 'today'
-        ? el('span', { className: 'status-pill pill-today' }, 'Due Today')
-        : (rel.status === 'tomorrow' ? el('span', { className: 'status-pill pill-tomorrow' }, 'Tomorrow') : null),
-      due.completed
-        ? el('span', { className: 'status-pill pill-completed' }, '✓ Completed')
-        : null
-    );
-
-    const infoContainer = el(
-      'div',
-      { className: 'timeline-card-left' },
-      el('div', { className: 'timeline-card-top-row' }, timeEl, el('label', { className: 'timeline-checkbox-label' }, checkbox)),
-      titleEl,
-      courseLine,
-      locationLine,
-      pillsRow
-    );
-
-    // Right visual thumbnail
-    const thumbEl = el(
-      'a',
-      {
-        href: due.url,
-        target: '_blank',
-        rel: 'noopener noreferrer',
-        className: `timeline-card-thumb ${isQuiz ? 'thumb-quiz' : 'thumb-dropbox'}`,
-        title: 'Open in Waterloo LEARN ↗',
-        onClick: (e) => {
-          if (typeof chrome !== 'undefined' && chrome.tabs) {
-            e.preventDefault();
-            chrome.tabs.create({ url: due.url });
-          }
-        },
-      },
-      el('div', { className: 'thumb-subj' }, badgeData.subj),
-      el('div', { className: 'thumb-num' }, badgeData.num),
-      el('span', { className: 'thumb-icon' }, '↗')
-    );
-
-    const card = el(
-      'div',
-      { className: `timeline-card ${due.completed ? 'is-completed' : ''}` },
-      infoContainer,
-      thumbEl
-    );
-
-    return card;
   }
 }

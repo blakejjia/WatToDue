@@ -1,5 +1,6 @@
 import { el, clear } from '../utils/dom.js';
-import { formatDueRelative, getMonthMatrix, isSameDay } from '../utils/date-utils.js';
+import { formatDueRelative, getMonthMatrix, isSameDay, groupDuesByDate } from '../utils/date-utils.js';
+import { createTimelineCard } from './timeline-card.js';
 import { storageManager } from '../services/storage-manager.js';
 
 export class CalendarView {
@@ -47,13 +48,13 @@ export class CalendarView {
         { style: { display: 'flex', flexDirection: 'column' } },
         el(
           'span',
-          { style: { fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)' } },
+          { style: { fontSize: '14px', fontWeight: '800', color: 'var(--text-primary)' } },
           `${activeCount} Pending Due${activeCount === 1 ? '' : 's'}`
         ),
         completedCount > 0
           ? el(
               'span',
-              { style: { fontSize: '11px', color: 'var(--text-secondary)' } },
+              { style: { fontSize: '12px', color: 'var(--text-secondary)' } },
               `${completedCount} completed items`
             )
           : null
@@ -97,8 +98,6 @@ export class CalendarView {
   }
 
   renderAgenda() {
-    const listContainer = el('div', { className: 'agenda-list' });
-
     if (!this.dues || this.dues.length === 0) {
       return el(
         'div',
@@ -109,157 +108,120 @@ export class CalendarView {
       );
     }
 
+    const { overdue, dateGroups, completed } = groupDuesByDate(this.dues);
     const now = new Date();
 
-    const sections = {
-      overdue: [],
-      today: [],
-      tomorrow: [],
-      upcoming: [],
-      completed: [],
+    const timelineContainer = el('div', { className: 'timeline-container fullpage-timeline' });
+
+    // Vertical spine line
+    const spine = el('div', { className: 'timeline-spine' });
+    timelineContainer.appendChild(spine);
+
+    const onToggle = async (dueId, completedVal) => {
+      await storageManager.toggleCompleted(dueId);
+      const targetDue = this.dues.find((d) => d.id === dueId);
+      if (targetDue) targetDue.completed = completedVal;
+      this.render();
+      if (this.onRefresh) this.onRefresh();
     };
 
-    for (const due of this.dues) {
-      if (due.completed) {
-        sections.completed.push(due);
-        continue;
-      }
-      const rel = formatDueRelative(due.dueDate, now);
-      if (rel.status === 'overdue') sections.overdue.push(due);
-      else if (rel.status === 'today') sections.today.push(due);
-      else if (rel.status === 'tomorrow') sections.tomorrow.push(due);
-      else sections.upcoming.push(due);
-    }
-
-    const sectionMeta = [
-      { key: 'overdue', label: '🔴 Overdue', className: 'overdue' },
-      { key: 'today', label: '🟡 Due Today', className: 'today' },
-      { key: 'tomorrow', label: '🟢 Due Tomorrow', className: '' },
-      { key: 'upcoming', label: '⚪ Upcoming', className: '' },
-      { key: 'completed', label: '✔ Completed', className: '' },
-    ];
-
-    for (const sec of sectionMeta) {
-      const items = sections[sec.key];
-      if (items.length === 0) continue;
-
-      const secEl = el('div', { className: 'agenda-section' });
-
-      if (sec.key === 'completed') {
-        const headerEl = el(
+    // 1. Overdue section (if any)
+    if (overdue.length > 0) {
+      const overdueGroup = el('div', { className: 'timeline-group overdue' });
+      const nodeHeader = el(
+        'div',
+        { className: 'timeline-node-header' },
+        el('div', { className: 'timeline-dot overdue-dot' }),
+        el(
           'div',
-          {
-            className: 'agenda-section-title',
-            style: {
-              cursor: 'pointer',
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
-              userSelect: 'none',
-              padding: '4px 0',
-            },
-            onClick: () => {
-              this.showCompleted = !this.showCompleted;
-              this.render();
-            },
-          },
-          el('span', {}, `${sec.label} (${items.length})`),
-          el(
-            'span',
-            {
-              style: {
-                fontSize: '11px',
-                fontWeight: '600',
-                color: 'var(--text-secondary)',
-                padding: '2px 8px',
-                borderRadius: '4px',
-                background: 'var(--bg-card-hover)',
-              },
-            },
-            this.showCompleted ? 'Hide ▲' : 'Show ▼'
-          )
-        );
-        secEl.appendChild(headerEl);
+          { className: 'timeline-date-label' },
+          el('strong', { className: 'timeline-date-bold overdue-text' }, 'Overdue'),
+          el('span', { className: 'timeline-weekday overdue-text' }, `${overdue.length} items require attention`)
+        )
+      );
+      overdueGroup.appendChild(nodeHeader);
 
-        if (this.showCompleted) {
-          for (const item of items) {
-            secEl.appendChild(this.createDueCard(item, now));
-          }
-        }
-      } else {
-        secEl.appendChild(
-          el(
-            'div',
-            { className: `agenda-section-title ${sec.className}` },
-            `${sec.label} (${items.length})`
-          )
-        );
-        for (const item of items) {
-          secEl.appendChild(this.createDueCard(item, now));
-        }
+      const grid = el('div', { className: 'timeline-cards-grid' });
+      for (const item of overdue) {
+        grid.appendChild(createTimelineCard(item, now, onToggle));
       }
-
-      listContainer.appendChild(secEl);
+      overdueGroup.appendChild(grid);
+      timelineContainer.appendChild(overdueGroup);
     }
 
-    return listContainer;
+    // 2. Upcoming date groups (chronological, e.g. Nov 24, Nov 27, Dec 4)
+    for (const group of dateGroups) {
+      const comp = group.components || { bold: group.header, subtitle: '' };
+      const groupEl = el('div', { className: `timeline-group ${comp.isToday ? 'is-today' : ''}` });
+
+      const nodeHeader = el(
+        'div',
+        { className: 'timeline-node-header' },
+        el('div', { className: `timeline-dot ${comp.isToday ? 'today-dot' : ''}` }),
+        el(
+          'div',
+          { className: 'timeline-date-label' },
+          el('strong', { className: 'timeline-date-bold' }, comp.bold),
+          comp.subtitle ? el('span', { className: 'timeline-weekday' }, comp.subtitle) : null
+        )
+      );
+      groupEl.appendChild(nodeHeader);
+
+      const grid = el('div', { className: 'timeline-cards-grid' });
+      for (const item of group.items) {
+        grid.appendChild(createTimelineCard(item, now, onToggle));
+      }
+      groupEl.appendChild(grid);
+      timelineContainer.appendChild(groupEl);
+    }
+
+    // 3. Completed section (collapsible)
+    if (completed.length > 0) {
+      const completedGroup = el('div', { className: 'timeline-group completed' });
+      const nodeHeader = el(
+        'div',
+        {
+          className: 'timeline-node-header completed-toggle',
+          onClick: () => {
+            this.showCompleted = !this.showCompleted;
+            this.render();
+          },
+        },
+        el('div', { className: 'timeline-dot completed-dot' }),
+        el(
+          'div',
+          { className: 'timeline-date-label' },
+          el('strong', { className: 'timeline-date-bold' }, 'Completed'),
+          el('span', { className: 'timeline-weekday' }, `${completed.length} cleared`)
+        ),
+        el(
+          'span',
+          { className: 'timeline-toggle-pill' },
+          this.showCompleted ? 'Hide ▲' : 'Show ▼'
+        )
+      );
+      completedGroup.appendChild(nodeHeader);
+
+      if (this.showCompleted) {
+        const grid = el('div', { className: 'timeline-cards-grid' });
+        for (const item of completed) {
+          grid.appendChild(createTimelineCard(item, now, onToggle));
+        }
+        completedGroup.appendChild(grid);
+      }
+      timelineContainer.appendChild(completedGroup);
+    }
+
+    return timelineContainer;
   }
 
   createDueCard(due, now) {
-    const rel = formatDueRelative(due.dueDate, now);
-
-    const checkbox = el('input', {
-      type: 'checkbox',
-      className: 'due-checkbox',
-      checked: Boolean(due.completed),
-      onChange: async (e) => {
-        const checked = e.target.checked;
-        due.completed = checked;
-        await storageManager.toggleCompleted(due.id);
-        this.render();
-      },
+    return createTimelineCard(due, now, async (dueId, completed) => {
+      due.completed = completed;
+      await storageManager.toggleCompleted(due.id);
+      this.render();
+      if (this.onRefresh) this.onRefresh();
     });
-
-    const typeBadge = el(
-      'span',
-      { className: `badge ${due.type === 'assignment' ? 'badge-assignment' : 'badge-quiz'}` },
-      due.type === 'assignment' ? 'Dropbox' : 'Quiz'
-    );
-
-    const timingClass = due.completed ? '' : (rel.status === 'overdue' ? 'overdue' : (rel.status === 'today' ? 'today' : ''));
-
-    const card = el(
-      'div',
-      { className: `due-card ${due.completed ? 'completed' : ''}` },
-      el('label', { className: 'due-checkbox-label' }, checkbox),
-      el(
-        'div',
-        { className: 'due-info' },
-        el(
-          'div',
-          { className: 'due-meta' },
-          el('span', { className: 'due-course-tag' }, due.courseName),
-          typeBadge
-        ),
-        el('div', { className: 'due-title', title: due.title }, due.title),
-        el('div', { className: `due-timing ${timingClass}` },
-          due.completed ? `Completed · Due was ${rel.dateStr}` : rel.text
-        )
-      ),
-      el(
-        'a',
-        {
-          className: 'btn btn-secondary btn-sm due-link-btn',
-          href: due.url,
-          target: '_blank',
-          rel: 'noopener noreferrer',
-          title: 'Open in LEARN',
-        },
-        'Open ↗'
-      )
-    );
-
-    return card;
   }
 
   renderMonthCalendar() {
@@ -369,9 +331,11 @@ export class CalendarView {
       );
       flyout.appendChild(flyoutTitle);
 
+      const flyoutGrid = el('div', { className: 'timeline-cards-grid', style: { paddingLeft: '0' } });
       for (const item of this.selectedDayDues) {
-        flyout.appendChild(this.createDueCard(item, now));
+        flyoutGrid.appendChild(this.createDueCard(item, now));
       }
+      flyout.appendChild(flyoutGrid);
       container.appendChild(flyout);
     }
 
