@@ -1,4 +1,4 @@
-import { readFileSync, mkdirSync, existsSync, rmSync } from 'node:fs';
+import { readFileSync, mkdirSync, existsSync, rmSync, copyFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { execSync } from 'node:child_process';
 
@@ -41,4 +41,7 @@ if (process.platform === 'win32') {
   });
 }
 
-console.log(`Successfully packed: dist/${zipName}`);
+const altZipName = `com.jia-yx.wattodo-v${version}.zip`;
+copyFileSync(zipPath, join(distDir, altZipName));
+
+console.log(`Successfully packed: dist/${zipName} & dist/${altZipName}`);

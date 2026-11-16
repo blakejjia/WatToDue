@@ -1,5 +1,5 @@
 {
-  "name": "wattodue",
+  "name": "com.jia-yx.wattodo",
   "version": "1.0.0",
   "description": "Chrome extension for Waterloo LEARN dues, calendar, and grades.",
   "type": "module",
