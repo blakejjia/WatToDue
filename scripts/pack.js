@@ -41,7 +41,4 @@ if (process.platform === 'win32') {
   });
 }
 
-const altZipName = `com.jia-yx.wattodo-v${version}.zip`;
-copyFileSync(zipPath, join(distDir, altZipName));
-
-console.log(`Successfully packed: dist/${zipName} & dist/${altZipName}`);
+console.log(`Successfully packed: dist/${zipName}`);
