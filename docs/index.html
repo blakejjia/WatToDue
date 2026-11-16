@@ -3,35 +3,126 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light dark">
   <title>WatToDue — Waterloo LEARN Dues, Calendar & Grades Extension</title>
   <meta name="description" content="The modern Chrome extension for University of Waterloo students. Consolidates assignments, quizzes, and grade feedback directly from Waterloo LEARN.">
-  <link rel="icon" type="image/png" href="../icons/icon-48.png">
+  <link rel="icon" type="image/png" href="assets/icons/icon-48.png">
+
+  <!-- Tailwind CSS -->
   <script src="https://www.gstatic.com/antigravity/web/dev/tailwindcss.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            uw: {
+              gold: '#FDD54F',
+              amber: '#F59E0B',
+              black: '#1E1E1E',
+              dark: '#0F1117',
+            }
+          }
+        }
+      }
+    };
+  </script>
+
+  <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
+
+  <!-- Early Theme Detection to prevent FOUC -->
+  <script>
+    (function() {
+      const stored = localStorage.getItem('wattodue_site_theme');
+      if (stored === 'dark' || (!stored && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    })();
+  </script>
+
   <style>
-    :root {
-      --uw-gold: #f59e0b;
-      --uw-black: #09090b;
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #94a3b8;
+      border-radius: 9999px;
+    }
+    .dark ::-webkit-scrollbar-thumb {
+      background: #334155;
+    }
+
+    /* Course Badge Pills */
+    .badge-lec {
+      background-color: rgba(59, 130, 246, 0.12);
+      color: #2563eb;
+      border: 1px solid rgba(59, 130, 246, 0.25);
+    }
+    .dark .badge-lec {
+      background-color: rgba(59, 130, 246, 0.2);
+      color: #93c5fd;
+      border-color: rgba(59, 130, 246, 0.35);
+    }
+
+    .badge-lab {
+      background-color: rgba(16, 185, 129, 0.12);
+      color: #059669;
+      border: 1px solid rgba(16, 185, 129, 0.25);
+    }
+    .dark .badge-lab {
+      background-color: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
+      border-color: rgba(16, 185, 129, 0.35);
+    }
+
+    /* Spine Animation */
+    .timeline-spine-line {
+      position: absolute;
+      top: 18px;
+      bottom: 24px;
+      left: 17px;
+      width: 2px;
     }
   </style>
 </head>
-<body class="bg-slate-950 text-slate-100 antialiased font-sans selection:bg-amber-400 selection:text-slate-950">
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 antialiased font-sans transition-colors duration-200 selection:bg-amber-400 selection:text-slate-950">
 
   <!-- Navigation Bar -->
-  <header class="sticky top-0 z-50 backdrop-blur-md bg-slate-950/80 border-b border-slate-800">
+  <header class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-slate-950/80 border-b border-slate-200 dark:border-slate-800 transition-colors">
     <div class="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
       <div class="flex items-center gap-3">
-        <img src="../icons/icon-48.png" alt="WatToDue Logo" width="36" height="36" class="rounded-xl shadow-md border border-amber-400/30">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-400 to-yellow-500 flex items-center justify-center shadow-md shadow-amber-400/20 text-slate-950 font-black text-lg">
+          W
+        </div>
         <div>
-          <span class="text-lg font-black tracking-tight text-white">WatTo<span class="text-amber-400">Due</span></span>
-          <span class="hidden sm:inline-block text-[11px] font-semibold px-2 py-0.5 ml-2 rounded-full bg-amber-400/10 text-amber-300 border border-amber-400/20">v1.0.0</span>
+          <span class="text-lg font-black tracking-tight text-slate-900 dark:text-white">WatTo<span class="text-amber-500 dark:text-amber-400">Due</span></span>
+          <span class="hidden sm:inline-block text-[11px] font-semibold px-2 py-0.5 ml-2 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">v1.0.0</span>
         </div>
       </div>
-      <div class="flex items-center gap-4 text-sm font-medium">
-        <a href="#features" class="hidden md:inline-block text-slate-400 hover:text-white transition-colors">Features</a>
-        <a href="#screenshots" class="hidden md:inline-block text-slate-400 hover:text-white transition-colors">Screenshots</a>
-        <a href="#install" class="hidden md:inline-block text-slate-400 hover:text-white transition-colors">Install</a>
-        <a href="https://github.com/blakejjia/WatToDue" target="_blank" rel="noopener noreferrer" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 transition-all flex items-center gap-2">
+
+      <div class="flex items-center gap-3 text-sm font-medium">
+        <a href="#preview" class="hidden md:inline-block text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Interactive Demo</a>
+        <a href="#features" class="hidden md:inline-block text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Features</a>
+        <a href="#install" class="hidden md:inline-block text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">Install</a>
+
+        <!-- Light / Dark Mode Toggle Button -->
+        <button id="theme-toggle-btn" 
+                aria-label="Toggle dark/light theme"
+                class="p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all flex items-center justify-center">
+          <i id="theme-icon-sun" data-lucide="sun" class="w-4 h-4 hidden dark:inline-block text-amber-400"></i>
+          <i id="theme-icon-moon" data-lucide="moon" class="w-4 h-4 inline-block dark:hidden text-slate-700"></i>
+        </button>
+
+        <a href="https://github.com/blakejjia/WatToDue" target="_blank" rel="noopener noreferrer" 
+           class="px-3.5 py-2 rounded-xl text-xs font-bold bg-slate-900 dark:bg-slate-800 hover:bg-slate-800 dark:hover:bg-slate-700 text-white border border-slate-700 transition-all flex items-center gap-1.5 shadow-sm">
           <i data-lucide="github" class="w-4 h-4"></i>
           <span>GitHub</span>
         </a>
@@ -40,163 +131,533 @@
   </header>
 
   <!-- Hero Section -->
-  <section class="relative pt-20 pb-16 overflow-hidden">
-    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-amber-500/15 via-transparent to-transparent pointer-events-none"></div>
+  <section class="relative pt-16 pb-12 overflow-hidden">
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_top,_var(--tw-gradient-stops))] from-amber-400/10 dark:from-amber-500/15 via-transparent to-transparent pointer-events-none"></div>
 
-    <div class="max-w-5xl mx-auto px-4 text-center relative z-10 space-y-6">
-      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-400/10 border border-amber-400/30 text-amber-300 text-xs font-semibold">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-400"></i>
-        <span>Built for UWaterloo Warriors</span>
+    <div class="max-w-4xl mx-auto px-4 text-center relative z-10 space-y-5">
+      <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 dark:bg-amber-400/10 border border-amber-500/30 dark:border-amber-400/30 text-amber-700 dark:text-amber-300 text-xs font-semibold">
+        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-amber-500 dark:text-amber-400"></i>
+        <span>Built for UWaterloo Warriors • Fall 2026 Ready</span>
       </div>
 
-      <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-white leading-[1.1]">
+      <h1 class="text-4xl sm:text-6xl font-black tracking-tight text-slate-900 dark:text-white leading-[1.15]">
         Never miss a deadline.<br>
-        <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-500">WatToDue has you covered.</span>
+        <span class="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 via-amber-400 to-yellow-600 dark:from-amber-400 dark:via-amber-300 dark:to-yellow-500">WatToDue has you covered.</span>
       </h1>
 
-      <p class="max-w-2xl mx-auto text-base sm:text-lg text-slate-400 leading-relaxed">
-        WatToDue pulls all your assignment dropboxes, quizzes, and grade feedback across your Waterloo LEARN courses into one clean, high-performance schedule.
+      <p class="max-w-2xl mx-auto text-base sm:text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
+        WatToDue gathers all your Waterloo LEARN assignment dropboxes, quizzes, and grade feedback into one clean, high-performance schedule — with zero tab clutter.
       </p>
 
-      <div class="flex items-center justify-center flex-wrap gap-4 pt-4">
-        <a href="https://github.com/blakejjia/WatToDue/releases/latest" target="_blank" rel="noopener noreferrer" class="px-6 py-3.5 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-sm shadow-lg shadow-amber-400/20 hover:shadow-amber-400/30 transition-all flex items-center gap-2">
+      <div class="flex items-center justify-center flex-wrap gap-3 pt-2">
+        <a href="https://github.com/blakejjia/WatToDue/releases/latest" target="_blank" rel="noopener noreferrer" 
+           class="px-6 py-3 rounded-2xl bg-amber-400 hover:bg-amber-300 text-slate-950 font-extrabold text-sm shadow-md shadow-amber-400/20 hover:shadow-amber-400/30 transition-all flex items-center gap-2">
           <i data-lucide="download" class="w-4 h-4 stroke-[2.5]"></i>
           <span>Download Extension (ZIP)</span>
         </a>
-        <a href="#install" class="px-6 py-3.5 rounded-2xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-bold text-sm transition-all flex items-center gap-2">
-          <span>Quick Setup Guide</span>
-          <i data-lucide="arrow-right" class="w-4 h-4"></i>
+        <a href="#preview" class="px-6 py-3 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-700 font-bold text-sm transition-all flex items-center gap-2 shadow-sm">
+          <span>Try Live Interactive Demo</span>
+          <i data-lucide="arrow-down" class="w-4 h-4"></i>
         </a>
-      </div>
-
-      <!-- Hero Screenshot Showcase -->
-      <div class="pt-10 max-w-5xl mx-auto">
-        <div class="rounded-2xl border border-slate-700/80 bg-slate-900/60 p-2 sm:p-3 shadow-2xl backdrop-blur-xl">
-          <img src="assets/screenshots/dashboard-agenda.png" 
-               alt="WatToDue Dashboard Agenda View" 
-               fetchpriority="high" 
-               width="1280" height="600" 
-               class="rounded-xl border border-slate-800 w-full object-cover shadow-inner">
-        </div>
-        <div class="text-xs text-slate-400 mt-3 font-medium flex items-center justify-center gap-1.5">
-          <i data-lucide="layers" class="w-3.5 h-3.5 text-amber-400"></i>
-          <span>Dashboard Agenda: Date-grouped timeline with multi-card cards & auto-detected submissions</span>
-        </div>
       </div>
     </div>
   </section>
 
+  <!-- Live In-Site Interactive Preview (Replacing Static Screenshots) -->
+  <section id="preview" class="py-12 border-t border-slate-200 dark:border-slate-800">
+    <div class="max-w-5xl mx-auto px-4">
+      
+      <div class="text-center max-w-2xl mx-auto mb-8 space-y-2">
+        <div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20 text-xs font-bold">
+          <i data-lucide="play-circle" class="w-3.5 h-3.5"></i>
+          <span>100% In-Browser Interactive Preview</span>
+        </div>
+        <h2 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white">Experience WatToDue Right Here</h2>
+        <p class="text-sm text-slate-600 dark:text-slate-400">
+          Switch tabs below and test real interactions: toggle task checkboxes, click calendar dates, inspect category grade trees, and preview the toolbar popup!
+        </p>
+      </div>
+
+      <!-- Preview Shell Window -->
+      <div class="rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 shadow-2xl overflow-hidden transition-all">
+        
+        <!-- App Titlebar / Tab Switcher -->
+        <div class="bg-slate-100 dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+          <!-- Window Controls Simulation -->
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-rose-400 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-amber-400 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-emerald-400 inline-block"></span>
+            <span class="ml-2 text-xs font-bold text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+              <i data-lucide="layout-dashboard" class="w-3.5 h-3.5 text-amber-500"></i>
+              <span>WatToDue Dashboard</span>
+            </span>
+          </div>
+
+          <!-- Preview Tabs -->
+          <div class="flex items-center bg-slate-200/80 dark:bg-slate-900 p-1 rounded-xl border border-slate-300 dark:border-slate-800 text-xs font-semibold">
+            <button class="preview-tab-btn active px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all bg-white dark:bg-slate-800 text-slate-900 dark:text-white shadow-sm" data-tab="agenda">
+              <i data-lucide="check-square" class="w-3.5 h-3.5 text-amber-500"></i>
+              <span>Agenda Timeline</span>
+            </button>
+            <button class="preview-tab-btn px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white" data-tab="calendar">
+              <i data-lucide="calendar" class="w-3.5 h-3.5 text-blue-500"></i>
+              <span>Monthly Calendar</span>
+            </button>
+            <button class="preview-tab-btn px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white" data-tab="grades">
+              <i data-lucide="graduation-cap" class="w-3.5 h-3.5 text-emerald-500"></i>
+              <span>Grades Standing</span>
+            </button>
+            <button class="preview-tab-btn px-3 py-1.5 rounded-lg flex items-center gap-1.5 transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white" data-tab="popup">
+              <i data-lucide="zap" class="w-3.5 h-3.5 text-purple-500"></i>
+              <span>Toolbar Popup</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Preview Body Container -->
+        <div class="p-4 sm:p-6 min-h-[460px] bg-slate-50 dark:bg-slate-900/60">
+
+          <!-- TAB 1: AGENDA TIMELINE -->
+          <div id="tab-agenda" class="preview-panel block space-y-6">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Current Term</span>
+                <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">Fall 2026 (1269)</span>
+              </div>
+              <div class="text-xs font-semibold text-slate-600 dark:text-slate-400 flex items-center gap-1.5">
+                <i data-lucide="check-circle" class="w-4 h-4 text-emerald-500"></i>
+                <span id="agenda-completed-counter">1 of 4 completed</span>
+              </div>
+            </div>
+
+            <!-- Timeline Content with Spine -->
+            <div class="relative pl-8 space-y-6">
+              <!-- Vertical spine -->
+              <div class="timeline-spine-line bg-slate-200 dark:bg-slate-800"></div>
+
+              <!-- Day 1: Today -->
+              <div class="space-y-3 relative">
+                <div class="flex items-center gap-2.5 -ml-8">
+                  <div class="w-3.5 h-3.5 rounded-full bg-amber-500 border-2 border-white dark:border-slate-900 z-10"></div>
+                  <span class="text-sm font-extrabold text-slate-900 dark:text-white">Today</span>
+                  <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Friday, Nov 20</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300">Urgent</span>
+                </div>
+
+                <!-- Assignment Card 1 -->
+                <div class="mock-task-card group p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 shadow-sm hover:shadow-md transition-all flex items-start justify-between gap-3" data-id="task-1">
+                  <div class="flex items-start gap-3">
+                    <input type="checkbox" class="mock-checkbox mt-1 w-4 h-4 rounded text-amber-500 focus:ring-amber-400 cursor-pointer" id="task-chk-1">
+                    <div>
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-extrabold px-2 py-0.5 rounded bg-blue-500/10 text-blue-600 dark:text-blue-400 border border-blue-500/20">CS 135</span>
+                        <span class="badge-lec text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">LEC</span>
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                          <i data-lucide="clock" class="w-3 h-3 text-slate-400"></i>
+                          <span>11:59 PM (in 6 hours)</span>
+                        </span>
+                      </div>
+                      <h4 class="task-title font-bold text-slate-900 dark:text-white text-sm mt-1">Assignment 4 — Binary Search Trees & Recursion</h4>
+                      <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Dropbox submission • Maximum 3 file attachments</p>
+                    </div>
+                  </div>
+                  <span class="task-status-badge shrink-0 text-[11px] font-bold px-2 py-1 rounded bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                    Due Soon
+                  </span>
+                </div>
+
+                <!-- Assignment Card 2 (LAB course showing auto LAB badge) -->
+                <div class="mock-task-card group p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 shadow-sm hover:shadow-md transition-all flex items-start justify-between gap-3" data-id="task-2">
+                  <div class="flex items-start gap-3">
+                    <input type="checkbox" class="mock-checkbox mt-1 w-4 h-4 rounded text-amber-500 focus:ring-amber-400 cursor-pointer" id="task-chk-2">
+                    <div>
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-extrabold px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">CHEM 120L</span>
+                        <span class="badge-lab text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">LAB</span>
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                          <i data-lucide="clock" class="w-3 h-3 text-slate-400"></i>
+                          <span>11:59 PM</span>
+                        </span>
+                      </div>
+                      <h4 class="task-title font-bold text-slate-900 dark:text-white text-sm mt-1">Lab Report 3 — Titration Curves & Buffer Capacity</h4>
+                      <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Submit Excel spreadsheet and PDF report</p>
+                    </div>
+                  </div>
+                  <span class="task-status-badge shrink-0 text-[11px] font-bold px-2 py-1 rounded bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20">
+                    Due Soon
+                  </span>
+                </div>
+              </div>
+
+              <!-- Day 2: Next Week -->
+              <div class="space-y-3 relative pt-2">
+                <div class="flex items-center gap-2.5 -ml-8">
+                  <div class="w-3.5 h-3.5 rounded-full bg-slate-400 dark:bg-slate-600 border-2 border-white dark:border-slate-900 z-10"></div>
+                  <span class="text-sm font-extrabold text-slate-900 dark:text-white">Tuesday</span>
+                  <span class="text-xs font-medium text-slate-500 dark:text-slate-400">Nov 24</span>
+                </div>
+
+                <!-- Assignment Card 3 (Pre-completed) -->
+                <div class="mock-task-card group p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white/60 dark:bg-slate-900/40 shadow-sm transition-all flex items-start justify-between gap-3 opacity-75" data-id="task-3">
+                  <div class="flex items-start gap-3">
+                    <input type="checkbox" checked class="mock-checkbox mt-1 w-4 h-4 rounded text-amber-500 focus:ring-amber-400 cursor-pointer" id="task-chk-3">
+                    <div>
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-extrabold px-2 py-0.5 rounded bg-purple-500/10 text-purple-600 dark:text-purple-400 border border-purple-500/20">MATH 135</span>
+                        <span class="badge-lec text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">LEC</span>
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                          <i data-lucide="clock" class="w-3 h-3 text-slate-400"></i>
+                          <span>5:00 PM</span>
+                        </span>
+                      </div>
+                      <h4 class="task-title font-bold text-slate-900 dark:text-white text-sm mt-1 line-through text-slate-500 dark:text-slate-500">Problem Set 4 — Modular Inverses & Fermat's Little Theorem</h4>
+                      <p class="text-xs text-slate-400 dark:text-slate-500 mt-0.5">Crowdmark submission • Submitted 1 day early</p>
+                    </div>
+                  </div>
+                  <span class="task-status-badge shrink-0 text-[11px] font-bold px-2 py-1 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                    Submitted
+                  </span>
+                </div>
+
+                <!-- Assignment Card 4: Quiz -->
+                <div class="mock-task-card group p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/90 shadow-sm hover:shadow-md transition-all flex items-start justify-between gap-3" data-id="task-4">
+                  <div class="flex items-start gap-3">
+                    <input type="checkbox" class="mock-checkbox mt-1 w-4 h-4 rounded text-amber-500 focus:ring-amber-400 cursor-pointer" id="task-chk-4">
+                    <div>
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-xs font-extrabold px-2 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">CHEM 120</span>
+                        <span class="badge-lec text-[10px] font-bold px-1.5 py-0.5 rounded uppercase">LEC</span>
+                        <span class="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                          <i data-lucide="clock" class="w-3 h-3 text-slate-400"></i>
+                          <span>8:00 PM</span>
+                        </span>
+                      </div>
+                      <h4 class="task-title font-bold text-slate-900 dark:text-white text-sm mt-1">Quiz 4 — Acid-Base Equilibrium & Le Chatelier</h4>
+                      <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Online Quiz • 45 minutes timed</p>
+                    </div>
+                  </div>
+                  <span class="task-status-badge shrink-0 text-[11px] font-bold px-2 py-1 rounded bg-slate-500/10 text-slate-600 dark:text-slate-400 border border-slate-500/20">
+                    Upcoming
+                  </span>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 2: MONTHLY CALENDAR -->
+          <div id="tab-calendar" class="preview-panel hidden space-y-4">
+            <div class="flex items-center justify-between pb-2 border-b border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-3">
+                <span class="text-base font-extrabold text-slate-900 dark:text-white">November 2026</span>
+                <span class="text-xs font-bold text-slate-500 dark:text-slate-400">Click any date with an amber dot to view flyout</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <button class="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400"><i data-lucide="chevron-left" class="w-4 h-4"></i></button>
+                <button class="p-1 rounded hover:bg-slate-200 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-400"><i data-lucide="chevron-right" class="w-4 h-4"></i></button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+              <!-- Calendar Matrix (2 cols) -->
+              <div class="lg:col-span-2 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-3 shadow-sm">
+                <!-- Day Headers -->
+                <div class="grid grid-cols-7 text-center text-xs font-bold text-slate-400 mb-2">
+                  <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                </div>
+                <!-- Month Matrix -->
+                <div class="grid grid-cols-7 gap-1 text-xs">
+                  <!-- Row 1 -->
+                  <div class="p-2 text-center text-slate-300 dark:text-slate-600 rounded">1</div>
+                  <div class="p-2 text-center text-slate-300 dark:text-slate-600 rounded">2</div>
+                  <div class="p-2 text-center text-slate-300 dark:text-slate-600 rounded">3</div>
+                  <div class="p-2 text-center text-slate-300 dark:text-slate-600 rounded">4</div>
+                  <div class="p-2 text-center text-slate-300 dark:text-slate-600 rounded">5</div>
+                  <div class="p-2 text-center text-slate-300 dark:text-slate-600 rounded">6</div>
+                  <div class="p-2 text-center text-slate-300 dark:text-slate-600 rounded">7</div>
+                  <!-- Row 2 -->
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">8</div>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">9</div>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">10</div>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">11</div>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">12</div>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">13</div>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">14</div>
+                  <!-- Row 3 -->
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">15</div>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">16</div>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">17</div>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">18</div>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">19</div>
+                  <!-- 20: TODAY (Has Dues) -->
+                  <button class="cal-date-btn p-2 text-center font-bold bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/40 rounded-lg relative cursor-pointer hover:scale-105 transition-all" data-date="Nov 20">
+                    <span>20</span>
+                    <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                  </button>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">21</div>
+                  <!-- Row 4 -->
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">22</div>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">23</div>
+                  <!-- 24: (Has Dues) -->
+                  <button class="cal-date-btn p-2 text-center font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg relative cursor-pointer" data-date="Nov 24">
+                    <span>24</span>
+                    <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-purple-500"></span>
+                  </button>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">25</div>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">26</div>
+                  <!-- 27: (Has Dues) -->
+                  <button class="cal-date-btn p-2 text-center font-bold text-slate-800 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-800 rounded-lg relative cursor-pointer" data-date="Nov 27">
+                    <span>27</span>
+                    <span class="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                  </button>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">28</div>
+                  <!-- Row 5 -->
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">29</div>
+                  <div class="p-2 text-center text-slate-700 dark:text-slate-300 rounded">30</div>
+                  <div class="p-2 text-center text-slate-300 dark:text-slate-600 rounded">1</div>
+                  <div class="p-2 text-center text-slate-300 dark:text-slate-600 rounded">2</div>
+                  <div class="p-2 text-center text-slate-300 dark:text-slate-600 rounded">3</div>
+                  <div class="p-2 text-center text-slate-300 dark:text-slate-600 rounded">4</div>
+                  <div class="p-2 text-center text-slate-300 dark:text-slate-600 rounded">5</div>
+                </div>
+              </div>
+
+              <!-- Day Flyout Panel (1 col) -->
+              <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 space-y-3 shadow-sm">
+                <div class="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                  <h4 id="cal-flyout-date" class="font-extrabold text-sm text-slate-900 dark:text-white flex items-center gap-1.5">
+                    <i data-lucide="calendar" class="w-4 h-4 text-amber-500"></i>
+                    <span>Friday, Nov 20, 2026</span>
+                  </h4>
+                  <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300">2 Items</span>
+                </div>
+
+                <div id="cal-flyout-items" class="space-y-2 text-xs">
+                  <div class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 space-y-1">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-blue-600 dark:text-blue-400">CS 135</span>
+                      <span class="text-[10px] text-slate-500">11:59 PM</span>
+                    </div>
+                    <div class="font-semibold text-slate-800 dark:text-slate-200">Assignment 4 — Binary Trees</div>
+                  </div>
+                  <div class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 space-y-1">
+                    <div class="flex items-center justify-between">
+                      <span class="font-bold text-emerald-600 dark:text-emerald-400">CHEM 120L</span>
+                      <span class="text-[10px] text-slate-500">11:59 PM</span>
+                    </div>
+                    <div class="font-semibold text-slate-800 dark:text-slate-200">Lab Report 3 — Titration Curves</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- TAB 3: GRADES STANDING -->
+          <div id="tab-grades" class="preview-panel hidden space-y-4">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
+              <div class="flex items-center gap-3">
+                <span class="text-sm font-bold text-slate-900 dark:text-white">CS 135: Designing Functional Programs</span>
+                <span class="text-xs font-extrabold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20">
+                  Calculated Standing: 89.2% (A+)
+                </span>
+              </div>
+              <span class="text-xs text-slate-500 dark:text-slate-400">Unmarked items treated as <strong>Ungraded</strong></span>
+            </div>
+
+            <!-- Hierarchical Grade Table Preview -->
+            <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-hidden shadow-sm text-xs">
+              <table class="w-full text-left">
+                <thead class="bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 font-bold border-b border-slate-200 dark:border-slate-800">
+                  <tr>
+                    <th class="p-3">Assessment Item</th>
+                    <th class="p-3 text-center">Score</th>
+                    <th class="p-3 text-center">Weight</th>
+                    <th class="p-3 text-right">Feedback</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 dark:divide-slate-800/60">
+                  <!-- Category 1: Assignments -->
+                  <tr class="bg-slate-50/60 dark:bg-slate-800/40 font-bold">
+                    <td class="p-3 flex items-center gap-2 text-slate-900 dark:text-white">
+                      <i data-lucide="folder" class="w-4 h-4 text-amber-500"></i>
+                      <span>Assignments Category</span>
+                    </td>
+                    <td class="p-3 text-center font-bold text-emerald-600 dark:text-emerald-400">92.5%</td>
+                    <td class="p-3 text-center text-slate-500">20.00%</td>
+                    <td class="p-3 text-right text-slate-400">—</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 pl-8 text-slate-800 dark:text-slate-200">Assignment 1 — Fundamentals</td>
+                    <td class="p-3 text-center font-semibold text-slate-900 dark:text-white">48 / 50 (96.0%)</td>
+                    <td class="p-3 text-center text-slate-500">4.00%</td>
+                    <td class="p-3 text-right"><span class="text-amber-600 dark:text-amber-400 font-medium cursor-pointer hover:underline">View Rubric</span></td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 pl-8 text-slate-800 dark:text-slate-200">Assignment 2 — Lists & Structs</td>
+                    <td class="p-3 text-center font-semibold text-slate-900 dark:text-white">44 / 50 (88.0%)</td>
+                    <td class="p-3 text-center text-slate-500">4.00%</td>
+                    <td class="p-3 text-right"><span class="text-amber-600 dark:text-amber-400 font-medium cursor-pointer hover:underline">View Rubric</span></td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 pl-8 text-slate-800 dark:text-slate-200">Assignment 3 — Trees & HOF</td>
+                    <td class="p-3 text-center font-semibold text-slate-900 dark:text-white">47 / 50 (94.0%)</td>
+                    <td class="p-3 text-center text-slate-500">4.00%</td>
+                    <td class="p-3 text-right"><span class="text-amber-600 dark:text-amber-400 font-medium cursor-pointer hover:underline">View Rubric</span></td>
+                  </tr>
+                  <!-- Category 2: Midterm -->
+                  <tr class="bg-slate-50/60 dark:bg-slate-800/40 font-bold">
+                    <td class="p-3 flex items-center gap-2 text-slate-900 dark:text-white">
+                      <i data-lucide="folder" class="w-4 h-4 text-blue-500"></i>
+                      <span>Midterm Examination</span>
+                    </td>
+                    <td class="p-3 text-center font-bold text-emerald-600 dark:text-emerald-400">86.0%</td>
+                    <td class="p-3 text-center text-slate-500">25.00%</td>
+                    <td class="p-3 text-right text-slate-400">—</td>
+                  </tr>
+                  <tr>
+                    <td class="p-3 pl-8 text-slate-800 dark:text-slate-200">Midterm Exam (In-Person PAC)</td>
+                    <td class="p-3 text-center font-semibold text-slate-900 dark:text-white">86 / 100 (86.0%)</td>
+                    <td class="p-3 text-center text-slate-500">25.00%</td>
+                    <td class="p-3 text-right"><span class="text-slate-400">Crowdmark Graded</span></td>
+                  </tr>
+                  <!-- Category 3: Final Exam (Ungraded 0% masked properly) -->
+                  <tr class="bg-slate-50/60 dark:bg-slate-800/40 font-bold">
+                    <td class="p-3 flex items-center gap-2 text-slate-900 dark:text-white">
+                      <i data-lucide="folder" class="w-4 h-4 text-purple-500"></i>
+                      <span>Final Examination</span>
+                    </td>
+                    <td class="p-3 text-center font-semibold text-slate-400">— (Ungraded)</td>
+                    <td class="p-3 text-center text-slate-500">40.00%</td>
+                    <td class="p-3 text-right text-slate-400">—</td>
+                  </tr>
+                  <tr class="opacity-60">
+                    <td class="p-3 pl-8 text-slate-600 dark:text-slate-400">Final Exam — December 2026</td>
+                    <td class="p-3 text-center font-medium text-slate-400">— (Not yet graded)</td>
+                    <td class="p-3 text-center text-slate-500">40.00%</td>
+                    <td class="p-3 text-right text-slate-400">—</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- TAB 4: TOOLBAR POPUP SIMULATION -->
+          <div id="tab-popup" class="preview-panel hidden">
+            <div class="flex justify-center py-2">
+              <!-- 380px Chrome Popup Window Simulation -->
+              <div class="w-full max-w-[380px] rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-950 shadow-2xl overflow-hidden flex flex-col h-[460px]">
+                
+                <!-- Popup Header -->
+                <div class="p-3.5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between bg-slate-50 dark:bg-slate-900">
+                  <div class="flex items-center gap-2">
+                    <div class="w-6 h-6 rounded-lg bg-amber-400 flex items-center justify-center font-black text-slate-950 text-xs">W</div>
+                    <span class="font-extrabold text-sm text-slate-900 dark:text-white">WatToDue</span>
+                    <span class="text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-400">3 Dues</span>
+                  </div>
+                  <div class="flex items-center gap-1.5">
+                    <button class="p-1 rounded-md text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800"><i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i></button>
+                    <button class="p-1 rounded-md text-slate-500 hover:bg-slate-200 dark:hover:bg-slate-800"><i data-lucide="maximize-2" class="w-3.5 h-3.5"></i></button>
+                  </div>
+                </div>
+
+                <!-- Popup Task List -->
+                <div class="p-3 flex-1 overflow-y-auto space-y-2 text-xs">
+                  <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 pt-1">Due Today</div>
+                  
+                  <div class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-start gap-2.5 hover:border-amber-400 transition-all">
+                    <input type="checkbox" class="mt-0.5 rounded text-amber-500 focus:ring-amber-400 cursor-pointer">
+                    <div class="flex-1">
+                      <div class="flex items-center justify-between">
+                        <span class="font-extrabold text-blue-600 dark:text-blue-400">CS 135</span>
+                        <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400">11:59 PM</span>
+                      </div>
+                      <div class="font-bold text-slate-900 dark:text-white mt-0.5">Assignment 4 — Binary Trees</div>
+                    </div>
+                  </div>
+
+                  <div class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-start gap-2.5 hover:border-amber-400 transition-all">
+                    <input type="checkbox" class="mt-0.5 rounded text-amber-500 focus:ring-amber-400 cursor-pointer">
+                    <div class="flex-1">
+                      <div class="flex items-center justify-between">
+                        <span class="font-extrabold text-emerald-600 dark:text-emerald-400">CHEM 120L</span>
+                        <span class="text-[10px] font-bold text-amber-600 dark:text-amber-400">11:59 PM</span>
+                      </div>
+                      <div class="font-bold text-slate-900 dark:text-white mt-0.5">Lab Report 3 — Titration Curves</div>
+                    </div>
+                  </div>
+
+                  <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 pt-2">Next Week</div>
+
+                  <div class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-start gap-2.5 hover:border-amber-400 transition-all">
+                    <input type="checkbox" class="mt-0.5 rounded text-amber-500 focus:ring-amber-400 cursor-pointer">
+                    <div class="flex-1">
+                      <div class="flex items-center justify-between">
+                        <span class="font-extrabold text-purple-600 dark:text-purple-400">MATH 135</span>
+                        <span class="text-[10px] font-bold text-slate-400">Nov 24 • 5:00 PM</span>
+                      </div>
+                      <div class="font-bold text-slate-900 dark:text-white mt-0.5">Problem Set 4 — Modular Arithmetic</div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Popup Footer -->
+                <div class="p-2.5 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 text-center">
+                  <span class="text-[11px] font-bold text-amber-600 dark:text-amber-400 cursor-pointer hover:underline flex items-center justify-center gap-1">
+                    <span>Open Fullscreen Dashboard</span>
+                    <i data-lucide="external-link" class="w-3 h-3"></i>
+                  </span>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </section>
+
   <!-- Feature Highlights -->
-  <section id="features" class="py-16 border-t border-slate-800 bg-slate-900/30">
+  <section id="features" class="py-16 border-t border-slate-200 dark:border-slate-800 bg-white/50 dark:bg-slate-900/30">
     <div class="max-w-6xl mx-auto px-4">
       <div class="text-center max-w-2xl mx-auto mb-14 space-y-3">
-        <h2 class="text-xs uppercase font-extrabold tracking-widest text-amber-400">Features</h2>
-        <p class="text-3xl font-black text-white">Engineered for how Waterloo students actually study</p>
+        <h2 class="text-xs uppercase font-extrabold tracking-widest text-amber-500 dark:text-amber-400">Features</h2>
+        <p class="text-3xl font-black text-slate-900 dark:text-white">Engineered for how Waterloo students actually study</p>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
         <!-- Feature 1 -->
-        <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all space-y-3">
-          <div class="w-10 h-10 rounded-xl bg-amber-400/10 border border-amber-400/20 text-amber-400 flex items-center justify-center font-bold text-xl">
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-amber-400 dark:hover:border-slate-700 transition-all space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-amber-500/10 dark:bg-amber-400/10 border border-amber-500/20 dark:border-amber-400/20 text-amber-600 dark:text-amber-400 flex items-center justify-center font-bold">
             <i data-lucide="calendar" class="w-5 h-5"></i>
           </div>
-          <h3 class="text-lg font-bold text-white">Consolidated Deadlines</h3>
-          <p class="text-sm text-slate-400 leading-relaxed">
-            Eliminate tab switching. Syncs all assignments, dropboxes, and quizzes across all active Fall, Winter, and Spring terms.
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Consolidated Deadlines</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+            Eliminate 10-tab switching. Syncs all assignments, dropboxes, and quizzes across all active Fall, Winter, and Spring terms in seconds.
           </p>
         </div>
 
         <!-- Feature 2 -->
-        <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all space-y-3">
-          <div class="w-10 h-10 rounded-xl bg-emerald-400/10 border border-emerald-400/20 text-emerald-400 flex items-center justify-center font-bold text-xl">
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-emerald-400 dark:hover:border-slate-700 transition-all space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/10 dark:bg-emerald-400/10 border border-emerald-500/20 dark:border-emerald-400/20 text-emerald-600 dark:text-emerald-400 flex items-center justify-center font-bold">
             <i data-lucide="graduation-cap" class="w-5 h-5"></i>
           </div>
-          <h3 class="text-lg font-bold text-white">True Grade Standing</h3>
-          <p class="text-sm text-slate-400 leading-relaxed">
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">True Grade Standing</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
             Organized in the exact Waterloo LEARN category tree. Unmarked future assessments (0%) are masked as Ungraded so your real average shines.
           </p>
         </div>
 
         <!-- Feature 3 -->
-        <div class="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 hover:border-slate-700 transition-all space-y-3">
-          <div class="w-10 h-10 rounded-xl bg-blue-400/10 border border-blue-400/20 text-blue-400 flex items-center justify-center font-bold text-xl">
+        <div class="p-6 rounded-2xl bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 shadow-sm hover:border-blue-400 dark:hover:border-slate-700 transition-all space-y-3">
+          <div class="w-10 h-10 rounded-xl bg-blue-500/10 dark:bg-blue-400/10 border border-blue-500/20 dark:border-blue-400/20 text-blue-600 dark:text-blue-400 flex items-center justify-center font-bold">
             <i data-lucide="flask-conical" class="w-5 h-5"></i>
           </div>
-          <h3 class="text-lg font-bold text-white">Lab & Lecture Recognition</h3>
-          <p class="text-sm text-slate-400 leading-relaxed">
-            Automatically differentiates Lectures (LEC), Laboratories (LAB like CHEM 220L), Tutorials (TUT), and Tests (TST).
-          </p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Screenshot Gallery Section -->
-  <section id="screenshots" class="py-16 border-t border-slate-800">
-    <div class="max-w-6xl mx-auto px-4 space-y-12">
-      <div class="text-center max-w-2xl mx-auto space-y-3">
-        <h2 class="text-xs uppercase font-extrabold tracking-widest text-amber-400">Visual Tour</h2>
-        <p class="text-3xl font-black text-white">Clean, elegant, and fast</p>
-      </div>
-
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-        <!-- Monthly Calendar -->
-        <div class="space-y-4">
-          <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-2 shadow-xl">
-            <img src="assets/screenshots/dashboard-calendar.png" 
-                 alt="Monthly Calendar Matrix" 
-                 loading="lazy" 
-                 width="640" height="400" 
-                 class="rounded-xl border border-slate-800/80 w-full object-cover">
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-              <i data-lucide="calendar-days" class="w-5 h-5 text-amber-400"></i>
-              <span>Monthly Calendar with Day Flyouts</span>
-            </h3>
-            <p class="text-sm text-slate-400 mt-1">
-              Select any date with due indicators to inspect side-by-side cards, exact submission times, and deep links.
-            </p>
-          </div>
-        </div>
-
-        <!-- Quick Toolbar Popup -->
-        <div class="space-y-4">
-          <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-2 shadow-xl flex justify-center">
-            <img src="assets/screenshots/popup-view.jpg" 
-                 alt="Quick Toolbar Popup" 
-                 loading="lazy" 
-                 width="420" height="500" 
-                 class="rounded-xl border border-slate-800/80 max-h-[400px] object-contain">
-          </div>
-          <div>
-            <h3 class="text-lg font-bold text-white flex items-center gap-2">
-              <i data-lucide="zap" class="w-5 h-5 text-amber-400"></i>
-              <span>1-Click Quick Popup</span>
-            </h3>
-            <p class="text-sm text-slate-400 mt-1">
-              Stay on top of what is due next without opening a new tab. Check off finished tasks or jump directly to the submission folder.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- Grades Breakdown Full Width -->
-      <div class="space-y-4 pt-6">
-        <div class="rounded-2xl border border-slate-800 bg-slate-900/80 p-2 shadow-xl">
-          <img src="assets/screenshots/grades-breakdown.png" 
-               alt="Waterloo LEARN Grade Breakdown" 
-               loading="lazy" 
-               width="1280" height="500" 
-               class="rounded-xl border border-slate-800/80 w-full object-cover">
-        </div>
-        <div>
-          <h3 class="text-lg font-bold text-white flex items-center gap-2">
-            <i data-lucide="folder-tree" class="w-5 h-5 text-amber-400"></i>
-            <span>Collapsible Categories & Direct Quiz Attempts Links</span>
-          </h3>
-          <p class="text-sm text-slate-400 mt-1">
-            Browse Problem Sets, Tests, and Reflections nested neatly under category folders with real-time weights and direct links to view quiz attempts.
+          <h3 class="text-lg font-bold text-slate-900 dark:text-white">Lab & Lecture Recognition</h3>
+          <p class="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
+            Automatically differentiates Lectures (LEC), Laboratories (LAB like CHEM 220L / CHEM 120L), Tutorials (TUT), and Tests (TST).
           </p>
         </div>
       </div>
@@ -204,44 +665,44 @@
   </section>
 
   <!-- Installation Guide -->
-  <section id="install" class="py-16 border-t border-slate-800 bg-slate-900/40">
+  <section id="install" class="py-16 border-t border-slate-200 dark:border-slate-800 bg-slate-100/60 dark:bg-slate-900/40">
     <div class="max-w-4xl mx-auto px-4 space-y-8">
       <div class="text-center space-y-3">
-        <h2 class="text-xs uppercase font-extrabold tracking-widest text-amber-400">Installation</h2>
-        <p class="text-3xl font-black text-white">Set up in 30 seconds</p>
-        <p class="text-sm text-slate-400">No developer skills required. Just download and load.</p>
+        <h2 class="text-xs uppercase font-extrabold tracking-widest text-amber-500 dark:text-amber-400">Installation</h2>
+        <p class="text-3xl font-black text-slate-900 dark:text-white">Set up in 30 seconds</p>
+        <p class="text-sm text-slate-600 dark:text-slate-400">No developer skills required. Just download and load unpacked in Chrome.</p>
       </div>
 
       <div class="space-y-4">
         <!-- Step 1 -->
-        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-4">
-          <div class="w-8 h-8 rounded-full bg-amber-400/20 text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">1</div>
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-start gap-4">
+          <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">1</div>
           <div>
-            <h4 class="font-bold text-white text-base">Download the Extension Package</h4>
-            <p class="text-sm text-slate-400 mt-1">
-              Download the latest <a href="https://github.com/blakejjia/WatToDue/releases/latest" class="text-amber-400 underline hover:text-amber-300">WatToDue.zip release</a> and unzip it to a folder on your computer.
+            <h4 class="font-bold text-slate-900 dark:text-white text-base">Download the Extension Package</h4>
+            <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+              Download the latest <a href="https://github.com/blakejjia/WatToDue/releases/latest" class="text-amber-600 dark:text-amber-400 underline font-semibold hover:text-amber-500">WatToDue.zip release</a> and unzip it to a folder on your computer.
             </p>
           </div>
         </div>
 
         <!-- Step 2 -->
-        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-4">
-          <div class="w-8 h-8 rounded-full bg-amber-400/20 text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">2</div>
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-start gap-4">
+          <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">2</div>
           <div>
-            <h4 class="font-bold text-white text-base">Open Chrome Extensions</h4>
-            <p class="text-sm text-slate-400 mt-1">
-              In Google Chrome, navigate to <code class="px-2 py-0.5 rounded bg-slate-800 text-amber-300 font-mono text-xs">chrome://extensions</code> and toggle <strong>Developer mode</strong> in the top-right corner.
+            <h4 class="font-bold text-slate-900 dark:text-white text-base">Open Chrome Extensions</h4>
+            <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+              In Google Chrome, navigate to <code class="px-2 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-amber-700 dark:text-amber-300 font-mono text-xs">chrome://extensions</code> and toggle <strong>Developer mode</strong> in the top-right corner.
             </p>
           </div>
         </div>
 
         <!-- Step 3 -->
-        <div class="p-5 rounded-2xl bg-slate-900 border border-slate-800 flex items-start gap-4">
-          <div class="w-8 h-8 rounded-full bg-amber-400/20 text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">3</div>
+        <div class="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex items-start gap-4">
+          <div class="w-8 h-8 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-400 flex items-center justify-center font-bold text-sm shrink-0">3</div>
           <div>
-            <h4 class="font-bold text-white text-base">Click "Load unpacked"</h4>
-            <p class="text-sm text-slate-400 mt-1">
-              Click the <strong>Load unpacked</strong> button and select the unzipped WatToDue folder. Pin WatToDue to your toolbar and log in to <a href="https://learn.uwaterloo.ca" target="_blank" class="text-amber-400 underline hover:text-amber-300">Waterloo LEARN</a>!
+            <h4 class="font-bold text-slate-900 dark:text-white text-base">Click "Load unpacked"</h4>
+            <p class="text-sm text-slate-600 dark:text-slate-400 mt-1">
+              Click the <strong>Load unpacked</strong> button and select the unzipped WatToDue folder. Pin WatToDue to your toolbar and log in to <a href="https://learn.uwaterloo.ca" target="_blank" class="text-amber-600 dark:text-amber-400 underline font-semibold hover:text-amber-500">Waterloo LEARN</a>!
             </p>
           </div>
         </div>
@@ -250,33 +711,174 @@
   </section>
 
   <!-- Privacy & Footer -->
-  <footer class="py-12 border-t border-slate-800 text-center text-xs text-slate-500 space-y-4">
-    <div class="flex items-center justify-center gap-6 text-slate-400 font-medium">
-      <a href="https://github.com/blakejjia/WatToDue" class="hover:text-amber-400 transition-colors flex items-center gap-1.5">
+  <footer class="py-12 border-t border-slate-200 dark:border-slate-800 text-center text-xs text-slate-500 space-y-4 bg-white dark:bg-slate-950">
+    <div class="flex items-center justify-center gap-6 text-slate-600 dark:text-slate-400 font-medium">
+      <a href="https://github.com/blakejjia/WatToDue" class="hover:text-amber-500 transition-colors flex items-center gap-1.5">
         <i data-lucide="github" class="w-4 h-4"></i>
         <span>GitHub Repository</span>
       </a>
-      <a href="https://learn.uwaterloo.ca" target="_blank" class="hover:text-amber-400 transition-colors flex items-center gap-1.5">
+      <a href="https://learn.uwaterloo.ca" target="_blank" class="hover:text-amber-500 transition-colors flex items-center gap-1.5">
         <i data-lucide="external-link" class="w-4 h-4"></i>
         <span>Waterloo LEARN</span>
       </a>
-      <a href="https://github.com/blakejjia/WatToDue/blob/main/LICENSE" class="hover:text-amber-400 transition-colors flex items-center gap-1.5">
+      <a href="https://github.com/blakejjia/WatToDue/blob/main/LICENSE" class="hover:text-amber-500 transition-colors flex items-center gap-1.5">
         <i data-lucide="file-text" class="w-4 h-4"></i>
         <span>MIT License</span>
       </a>
     </div>
-    <p class="flex items-center justify-center gap-1.5">
-      <i data-lucide="shield-check" class="w-4 h-4 text-emerald-400"></i>
+    <p class="flex items-center justify-center gap-1.5 text-slate-600 dark:text-slate-400 max-w-xl mx-auto px-4">
+      <i data-lucide="shield-check" class="w-4 h-4 text-emerald-500 shrink-0"></i>
       <span><strong>Privacy Guarantee</strong>: WatToDue runs 100% locally in your browser. No credentials, tokens, or personal student data are ever collected or sent to external servers.</span>
     </p>
     <p>© 2026 WatToDue. Built with 💛 for University of Waterloo students.</p>
   </footer>
 
-  <!-- Initialize Lucide Icons -->
+  <!-- Interactive JavaScript: Theme Toggle, Tabs & Checkboxes -->
   <script>
-    if (typeof lucide !== 'undefined') {
-      lucide.createIcons();
+    // 1. Initialize Lucide Icons
+    function refreshIcons() {
+      if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+      }
     }
+    refreshIcons();
+
+    // 2. Light / Dark Mode Toggle
+    const themeToggleBtn = document.getElementById('theme-toggle-btn');
+    themeToggleBtn.addEventListener('click', () => {
+      const isDark = document.documentElement.classList.toggle('dark');
+      localStorage.setItem('wattodue_site_theme', isDark ? 'dark' : 'light');
+      refreshIcons();
+    });
+
+    // 3. Preview Tab Switching
+    const tabButtons = document.querySelectorAll('.preview-tab-btn');
+    const panels = {
+      agenda: document.getElementById('tab-agenda'),
+      calendar: document.getElementById('tab-calendar'),
+      grades: document.getElementById('tab-grades'),
+      popup: document.getElementById('tab-popup'),
+    };
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const targetTab = btn.getAttribute('data-tab');
+
+        tabButtons.forEach(b => {
+          b.classList.remove('active', 'bg-white', 'dark:bg-slate-800', 'text-slate-900', 'dark:text-white', 'shadow-sm');
+          b.classList.add('text-slate-600', 'dark:text-slate-400');
+        });
+
+        btn.classList.add('active', 'bg-white', 'dark:bg-slate-800', 'text-slate-900', 'dark:text-white', 'shadow-sm');
+        btn.classList.remove('text-slate-600', 'dark:text-slate-400');
+
+        Object.keys(panels).forEach(key => {
+          if (panels[key]) {
+            panels[key].classList.toggle('hidden', key !== targetTab);
+            panels[key].classList.toggle('block', key === targetTab);
+          }
+        });
+
+        refreshIcons();
+      });
+    });
+
+    // 4. Interactive Task Checkboxes in Agenda Preview
+    const taskCheckboxes = document.querySelectorAll('.mock-checkbox');
+    const counterEl = document.getElementById('agenda-completed-counter');
+
+    function updateCompletedCounter() {
+      const allCheckboxes = document.querySelectorAll('.mock-checkbox');
+      let completedCount = 0;
+      allCheckboxes.forEach(chk => {
+        if (chk.checked) completedCount++;
+      });
+      if (counterEl) {
+        counterEl.textContent = `${completedCount} of ${allCheckboxes.length} completed`;
+      }
+    }
+
+    taskCheckboxes.forEach(chk => {
+      chk.addEventListener('change', (e) => {
+        const card = e.target.closest('.mock-task-card');
+        const title = card.querySelector('.task-title');
+        const badge = card.querySelector('.task-status-badge');
+
+        if (e.target.checked) {
+          card.classList.add('opacity-75');
+          title.classList.add('line-through', 'text-slate-500', 'dark:text-slate-500');
+          if (badge) {
+            badge.textContent = 'Submitted';
+            badge.className = 'task-status-badge shrink-0 text-[11px] font-bold px-2 py-1 rounded bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20';
+          }
+        } else {
+          card.classList.remove('opacity-75');
+          title.classList.remove('line-through', 'text-slate-500', 'dark:text-slate-500');
+          if (badge) {
+            badge.textContent = 'Due Soon';
+            badge.className = 'task-status-badge shrink-0 text-[11px] font-bold px-2 py-1 rounded bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20';
+          }
+        }
+        updateCompletedCounter();
+      });
+    });
+
+    // 5. Interactive Calendar Date Clicks
+    const calDateButtons = document.querySelectorAll('.cal-date-btn');
+    const flyoutDateEl = document.getElementById('cal-flyout-date');
+    const flyoutItemsEl = document.getElementById('cal-flyout-items');
+
+    const mockDateData = {
+      'Nov 20': {
+        title: 'Friday, Nov 20, 2026',
+        items: [
+          { course: 'CS 135', color: 'blue', time: '11:59 PM', task: 'Assignment 4 — Binary Search Trees' },
+          { course: 'CHEM 120L', color: 'emerald', time: '11:59 PM', task: 'Lab Report 3 — Titration Curves' }
+        ]
+      },
+      'Nov 24': {
+        title: 'Tuesday, Nov 24, 2026',
+        items: [
+          { course: 'MATH 135', color: 'purple', time: '5:00 PM', task: 'Problem Set 4 — Modular Arithmetic' }
+        ]
+      },
+      'Nov 27': {
+        title: 'Friday, Nov 27, 2026',
+        items: [
+          { course: 'CHEM 120', color: 'amber', time: '8:00 PM', task: 'Quiz 4 — Acid-Base Equilibrium' },
+          { course: 'ENGL 109', color: 'blue', time: '11:59 PM', task: 'Essay 2 — Rhetorical Analysis Draft' }
+        ]
+      }
+    };
+
+    calDateButtons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const dateKey = btn.getAttribute('data-date');
+        const data = mockDateData[dateKey];
+        if (!data) return;
+
+        // Visual selection on button
+        calDateButtons.forEach(b => b.classList.remove('ring-2', 'ring-amber-500'));
+        btn.classList.add('ring-2', 'ring-amber-500');
+
+        // Update Flyout
+        if (flyoutDateEl) {
+          flyoutDateEl.innerHTML = `<i data-lucide="calendar" class="w-4 h-4 text-amber-500"></i><span>${data.title}</span>`;
+        }
+        if (flyoutItemsEl) {
+          flyoutItemsEl.innerHTML = data.items.map(item => `
+            <div class="p-2.5 rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/60 space-y-1">
+              <div class="flex items-center justify-between">
+                <span class="font-bold text-${item.color}-600 dark:text-${item.color}-400">${item.course}</span>
+                <span class="text-[10px] text-slate-500">${item.time}</span>
+              </div>
+              <div class="font-semibold text-slate-800 dark:text-slate-200">${item.task}</div>
+            </div>
+          `).join('');
+        }
+        refreshIcons();
+      });
+    });
   </script>
 </body>
 </html>

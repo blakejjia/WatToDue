@@ -39,11 +39,18 @@ class PopupController {
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
       chrome.storage.onChanged.addListener(async (changes, area) => {
         if (area === 'local') {
+          if (changes.theme) {
+            this.applyTheme(changes.theme.newValue);
+          }
           await this.loadCache();
           this.renderList();
         }
       });
     }
+
+    // Apply saved theme immediately
+    const savedTheme = await storageManager.get('theme', 'auto');
+    this.applyTheme(savedTheme);
 
     // 1. Instant 0ms cache render
     await this.loadCache();
@@ -155,6 +162,14 @@ class PopupController {
 
   clearBanner() {
     clear(this.bannerContainerEl);
+  }
+
+  applyTheme(theme) {
+    if (theme && theme !== 'auto') {
+      document.documentElement.setAttribute('data-theme', theme);
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+    }
   }
 }
 

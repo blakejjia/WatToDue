@@ -1,24 +1,21 @@
 <div align="center">
 
-  <img src="icons/icon-128.png" alt="WatToDue Logo" width="88" height="88">
+  <img src="icons/icon-128.png" alt="WatToDue Logo" width="80" height="80">
 
   # WatToDue
 
-  **The missing deadline & grade tracker for University of Waterloo LEARN.**
+  ### Never miss a Waterloo deadline again.
 
-  [![Live Showcase](https://img.shields.io/badge/Live_Site-GitHub_Pages-f59e0b?style=for-the-badge&logo=github)](https://blakejjia.github.io/WatToDue/)
-  [![Download ZIP](https://img.shields.io/badge/Download-Latest_Release-blue?style=for-the-badge&logo=googlechrome)](https://github.com/blakejjia/WatToDue/releases/latest)
-  [![Manifest V3](https://img.shields.io/badge/Manifest-V3-10b981?style=for-the-badge)](manifest.json)
-  [![Tests](https://img.shields.io/badge/Tests-32_Passed-success?style=for-the-badge)](tests/)
-
-  <br>
+  [![Live Showcase](https://img.shields.io/badge/Interactive_Demo-GitHub_Pages-f59e0b?style=for-the-badge&logo=github)](https://blakejjia.github.io/WatToDue/)
+  [![Download ZIP](https://img.shields.io/badge/Download_Extension-v1.0.0-blue?style=for-the-badge&logo=googlechrome)](https://github.com/blakejjia/WatToDue/releases/latest)
+  [![Manifest V3](https://img.shields.io/badge/Chrome_MV3-Compliant-10b981?style=for-the-badge)](manifest.json)
+  [![Tests](https://img.shields.io/badge/Tests-32_Passing-success?style=for-the-badge)](tests/)
 
   <p align="center">
-    <b>No more clicking through 5 different course shells just to find out what's due tonight.</b><br>
-    WatToDue pulls all your dropboxes, quizzes, and grade breakdowns into one unified schedule.
+    <b>Consolidates assignment dropboxes, quizzes, and grade trees across all your Waterloo LEARN courses into one clean, high-performance dashboard.</b>
   </p>
 
-  [**🌐 Live Demo**](https://blakejjia.github.io/WatToDue/) • [**📦 Download ZIP**](https://github.com/blakejjia/WatToDue/releases/latest) • [**⚡ Quick Install**](#-quick-install-30-seconds)
+  [**🌐 Try Live Interactive Demo**](https://blakejjia.github.io/WatToDue/) • [**📦 Download ZIP**](https://github.com/blakejjia/WatToDue/releases/latest) • [**⚡ Quick Setup**](#-quick-setup-30s)
 
 </div>
 
@@ -26,80 +23,51 @@
 
 ---
 
-## ⚡ What it Solves
+### 💡 Why WatToDue?
 
-| Without WatToDue 😫 | With WatToDue 😎 |
+| Pain Point in LEARN 😫 | With WatToDue 🚀 |
 | :--- | :--- |
-| Clicking through each course shell individually | **One unified agenda** across all your enrolled courses |
-| Mystery `0 / 10` placeholders making your average look failing | **Real current average** computed only on marked work |
-| Wondering if you already submitted a quiz | **Auto-detects submitted dropboxes & completed attempts** |
-| Opening LEARN just to check a submission time | **1-click toolbar popup** with instant due countdowns |
-| Labs, lectures, and test slots lumped together | **Smart tags**: distinguishes `LEC`, `LAB` (e.g. `CHEM 220L`), and `TUT` |
+| Clicking through 5 separate course shells every morning | **Unified Chronological Timeline** across all enrolled courses |
+| Mystery `0 / 10` placeholders tanking your average | **True Standing**: Unmarked items displayed as *Ungraded* (`—`) |
+| Wondering if your dropbox submission went through | **Auto-detects submitted files & finished quiz attempts** |
+| Opening a heavy tab just to see what's due tonight | **1-Click Toolbar Popup** with instant countdowns |
+| Confusing lab and lecture sections | **Smart Classification**: Auto-tags `LEC`, `LAB` (e.g. `CHEM 220L`), `TUT`, `TST` |
+| Eye-straining bright white screens at 2 AM | **Dual Themes**: System Auto, Pure Dark Mode & Crisp Light Mode |
 
 ---
 
-## 📸 In Action
+### ✨ Core Capabilities
 
-### 1. Agenda View — All Deadlines, One Timeline
-Grouped chronologically with color-coded pills (`Dropbox` vs `Quiz`) and deep links straight to the submission box.
-
-![WatToDue Dashboard Agenda](docs/assets/screenshots/dashboard-agenda.png)
-
----
-
-### 2. Full Month Calendar Matrix
-Click any day with deadlines to open side-by-side cards with exact due times and status.
-
-![WatToDue Calendar View](docs/assets/screenshots/dashboard-calendar.png)
+- 📅 **Dual Visualizations**: Switch seamlessly between a chronological Luma-style **Agenda Timeline** and an interactive **Monthly Calendar Matrix**.
+- 📊 **Real Gradebook Hierarchy**: Matches Waterloo LEARN's exact category weights and folder structures. Unmarked future assignments never drag down your standing.
+- 🌓 **Theme Engine**: Complete dual Light & Dark mode support that adapts to your OS preference with 1-click manual overrides in Settings.
+- 🔒 **Privacy-First Architecture**: 100% client-side. Zero analytics, zero telemetry, and zero credentials stored. Everything stays strictly inside your browser.
 
 ---
 
-### 3. Real Gradebook (Matching LEARN)
-Hierarchical categories with collapsible folders, exact weights, and links to quiz attempts. Unmarked future assignments never drag down your current grade.
+### 🚀 Quick Setup (30s)
 
-![WatToDue Grades Breakdown](docs/assets/screenshots/grades-breakdown.png)
-
----
-
-### 4. 1-Click Toolbar Popup
-Check what's urgent right from your browser toolbar without loading full LEARN pages.
-
-<div align="center">
-  <img src="docs/assets/screenshots/popup-view.jpg" width="380" alt="WatToDue Toolbar Popup">
-</div>
+1. **Download**: Grab [`WatToDue-v1.0.0.zip`](https://github.com/blakejjia/WatToDue/releases/latest) and extract it.
+2. **Open Extensions**: Go to `chrome://extensions` in Google Chrome and enable **Developer mode** (top right).
+3. **Load**: Click **Load unpacked** and select the extracted folder.
+4. **Done**: Pin WatToDue to your toolbar and open [Waterloo LEARN](https://learn.uwaterloo.ca)!
 
 ---
 
-## 🚀 Quick Install (30 Seconds)
+### 🛠️ Development & Testing
 
-1. **Download**: Grab [`WatToDue-v1.0.0.zip`](https://github.com/blakejjia/WatToDue/releases/latest) and unzip it.
-2. **Open Chrome**: Navigate to `chrome://extensions` and toggle **Developer mode** (top right).
-3. **Load**: Click **Load unpacked** (top left) and select the unzipped folder.
-4. **Pin & Go**: Pin WatToDue to your toolbar, log into [Waterloo LEARN](https://learn.uwaterloo.ca), and click the icon!
-
----
-
-## 🔒 Privacy & Safety
-
-- **100% Local**: Runs entirely in your browser.
-- **Zero External Requests**: Only talks to `https://learn.uwaterloo.ca`.
-- **No Password Stored**: Uses your existing ambient browser session cookie.
-- **No Tracking**: Zero analytics, zero telemetries, zero third-party scripts.
-
----
-
-## 🛠️ For Developers
+WatToDue is built with pure Vanilla JavaScript (ES Modules) and Chrome Manifest V3. No bundling or heavyweight framework overhead.
 
 ```bash
-# Run test suite (32 unit tests)
+# Run the complete test suite (32 tests)
 npm test
 
-# Build release package
+# Build production zip package in dist/
 npm run pack
 ```
 
 ---
 
 <div align="center">
-  <sub>Built with 💛 by Waterloo students, for Waterloo students. MIT Licensed.</sub>
+  <sub>Built with 💛 by Waterloo students for Waterloo students. Not officially affiliated with Desire2Learn or the University of Waterloo.</sub>
 </div>

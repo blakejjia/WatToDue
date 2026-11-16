@@ -456,88 +456,170 @@ body.popup-mode {
 }
 
 /* ==========================================================================
-   Dark Mode Support
+   Dark Mode Support (Auto & Manual)
    ========================================================================== */
 @media (prefers-color-scheme: dark) {
-  body.popup-mode,
-  .popup-container,
-  .popup-header {
+  :root:not([data-theme="light"]) body.popup-mode,
+  :root:not([data-theme="light"]) .popup-container,
+  :root:not([data-theme="light"]) .popup-header {
     background-color: #0f1117;
   }
 
-  .popup-title {
+  :root:not([data-theme="light"]) .popup-title {
     color: #f9fafb;
   }
 
-  .popup-count-badge {
+  :root:not([data-theme="light"]) .popup-count-badge {
     background-color: #374151;
     color: #e5e7eb;
   }
 
-  .popup-actions .btn-pill {
+  :root:not([data-theme="light"]) .popup-actions .btn-pill {
     background-color: #1f2937;
     border-color: #374151;
     color: #d1d5db;
   }
 
-  .popup-actions .btn-pill:hover {
+  :root:not([data-theme="light"]) .popup-actions .btn-pill:hover {
     background-color: #374151;
     color: #ffffff;
   }
 
-  .timeline-spine {
+  :root:not([data-theme="light"]) .timeline-spine {
     background-color: #27272a;
   }
 
-  .timeline-dot {
+  :root:not([data-theme="light"]) .timeline-dot {
     border-color: #0f1117;
     background-color: #52525b;
   }
 
-  .timeline-date-bold {
+  :root:not([data-theme="light"]) .timeline-date-bold {
     color: #f9fafb;
   }
 
-  .timeline-card {
+  :root:not([data-theme="light"]) .timeline-card {
     background-color: #181b23;
     border-color: #262b38;
   }
 
-  .timeline-card:hover {
+  :root:not([data-theme="light"]) .timeline-card:hover {
     border-color: #3b4254;
   }
 
-  .timeline-card-title {
+  :root:not([data-theme="light"]) .timeline-card-title {
     color: #f9fafb;
   }
 
-  .timeline-card-time {
+  :root:not([data-theme="light"]) .timeline-card-time {
     color: #9ca3af;
   }
 
-  .thumb-quiz {
+  :root:not([data-theme="light"]) .thumb-quiz {
     background: linear-gradient(135deg, #2a2215 0%, #3d2e14 100%);
     border-color: #574116;
   }
 
-  .thumb-quiz .thumb-subj {
+  :root:not([data-theme="light"]) .thumb-quiz .thumb-subj {
     color: #fde68a;
   }
 
-  .thumb-quiz .thumb-num {
+  :root:not([data-theme="light"]) .thumb-quiz .thumb-num {
     color: #fcd34d;
   }
 
-  .thumb-dropbox {
+  :root:not([data-theme="light"]) .thumb-dropbox {
     background: linear-gradient(135deg, #132438 0%, #173252 100%);
     border-color: #1e4570;
   }
 
-  .thumb-dropbox .thumb-subj {
+  :root:not([data-theme="light"]) .thumb-dropbox .thumb-subj {
     color: #93c5fd;
   }
 
-  .thumb-dropbox .thumb-num {
+  :root:not([data-theme="light"]) .thumb-dropbox .thumb-num {
     color: #bfdbfe;
   }
+}
+
+:root[data-theme="dark"] body.popup-mode,
+:root[data-theme="dark"] .popup-container,
+:root[data-theme="dark"] .popup-header {
+  background-color: #0f1117;
+}
+
+:root[data-theme="dark"] .popup-title {
+  color: #f9fafb;
+}
+
+:root[data-theme="dark"] .popup-count-badge {
+  background-color: #374151;
+  color: #e5e7eb;
+}
+
+:root[data-theme="dark"] .popup-actions .btn-pill {
+  background-color: #1f2937;
+  border-color: #374151;
+  color: #d1d5db;
+}
+
+:root[data-theme="dark"] .popup-actions .btn-pill:hover {
+  background-color: #374151;
+  color: #ffffff;
+}
+
+:root[data-theme="dark"] .timeline-spine {
+  background-color: #27272a;
+}
+
+:root[data-theme="dark"] .timeline-dot {
+  border-color: #0f1117;
+  background-color: #52525b;
+}
+
+:root[data-theme="dark"] .timeline-date-bold {
+  color: #f9fafb;
+}
+
+:root[data-theme="dark"] .timeline-card {
+  background-color: #181b23;
+  border-color: #262b38;
+}
+
+:root[data-theme="dark"] .timeline-card:hover {
+  border-color: #3b4254;
+}
+
+:root[data-theme="dark"] .timeline-card-title {
+  color: #f9fafb;
+}
+
+:root[data-theme="dark"] .timeline-card-time {
+  color: #9ca3af;
+}
+
+:root[data-theme="dark"] .thumb-quiz {
+  background: linear-gradient(135deg, #2a2215 0%, #3d2e14 100%);
+  border-color: #574116;
+}
+
+:root[data-theme="dark"] .thumb-quiz .thumb-subj {
+  color: #fde68a;
+}
+
+:root[data-theme="dark"] .thumb-quiz .thumb-num {
+  color: #fcd34d;
+}
+
+:root[data-theme="dark"] .thumb-dropbox {
+  background: linear-gradient(135deg, #132438 0%, #173252 100%);
+  border-color: #1e4570;
+}
+
+:root[data-theme="dark"] .thumb-dropbox .thumb-subj {
+  color: #93c5fd;
+}
+
+:root[data-theme="dark"] .thumb-dropbox .thumb-num {
+  color: #bfdbfe;
 }

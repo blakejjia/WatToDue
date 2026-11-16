@@ -114,6 +114,31 @@ export class SettingsView {
     );
     root.appendChild(termCard);
 
+    // 2.5. Theme & Appearance
+    const currentTheme = (typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme')) || 'auto';
+    const themeCard = el(
+      'div',
+      {
+        style: {
+          backgroundColor: 'var(--bg-surface)',
+          border: '1px solid var(--border-color)',
+          borderRadius: 'var(--border-radius-md)',
+          padding: '14px',
+          boxShadow: 'var(--shadow-sm)',
+        },
+      },
+      el('div', { style: { fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' } },
+        'Appearance & Theme'
+      ),
+      el('div', { style: { display: 'flex', gap: '8px', alignItems: 'center' } },
+        this.renderThemeSelect(currentTheme),
+        el('span', { style: { fontSize: '11px', color: 'var(--text-muted)' } },
+          'Switch between Light, Dark, or System automatic theme'
+        )
+      )
+    );
+    root.appendChild(themeCard);
+
     // 3. Course Inspector & Inclusion Toggles
     const courseCard = el(
       'div',
@@ -196,6 +221,43 @@ export class SettingsView {
     root.appendChild(infoFooter);
 
     this.container.appendChild(root);
+  }
+
+  renderThemeSelect(currentTheme) {
+    const select = el('select', {
+      className: 'select-input',
+      style: {
+        padding: '6px 12px',
+        fontSize: '12px',
+        fontWeight: '600',
+        borderRadius: 'var(--border-radius-sm)',
+        border: '1px solid var(--border-color)',
+        backgroundColor: 'var(--bg-app)',
+        color: 'var(--text-primary)',
+        cursor: 'pointer',
+      },
+      onChange: async (e) => {
+        const theme = e.target.value;
+        if (theme === 'auto') {
+          document.documentElement.removeAttribute('data-theme');
+        } else {
+          document.documentElement.setAttribute('data-theme', theme);
+        }
+        await storageManager.set('theme', theme);
+      },
+    });
+
+    const options = [
+      { value: 'auto', label: '🖥️ System Default' },
+      { value: 'light', label: '☀️ Light Mode' },
+      { value: 'dark', label: '🌙 Dark Mode' },
+    ];
+
+    for (const opt of options) {
+      const optionEl = el('option', { value: opt.value, selected: opt.value === currentTheme }, opt.label);
+      select.appendChild(optionEl);
+    }
+    return select;
   }
 
   renderTermSelect() {

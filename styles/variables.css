@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light dark;
   --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 
@@ -9,7 +10,7 @@
   --uw-black: #1E1E1E;
   --uw-charcoal: #2A2A2A;
 
-  /* Surface and Backgrounds */
+  /* Surface and Backgrounds (Default Light) */
   --bg-app: #F8F9FA;
   --bg-surface: #FFFFFF;
   --bg-surface-elevated: #FFFFFF;
@@ -51,8 +52,38 @@
   --header-height: 52px;
 }
 
+/* Explicit Light Mode Override */
+:root[data-theme="light"],
+[data-theme="light"] {
+  color-scheme: light;
+  --bg-app: #F8F9FA;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #FFFFFF;
+  --bg-surface-hover: #F1F3F5;
+  --bg-rail: #1E1E1E;
+
+  --text-primary: #1F2937;
+  --text-secondary: #4B5563;
+  --text-muted: #9CA3AF;
+  --text-on-dark: #F9FAFB;
+  --text-gold: #B45309;
+
+  --border-color: #E5E7EB;
+  --border-color-subtle: #F3F4F6;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+
+  --color-assignment-bg: #EFF6FF;
+  --color-quiz-bg: #FEF3C7;
+  --color-overdue-bg: #FEE2E2;
+  --color-today-bg: #FFEDD5;
+  --color-success-bg: #DCFCE7;
+}
+
+/* System Dark Mode (when not forced to light) */
 @media (prefers-color-scheme: dark) {
-  :root {
+  :root:not([data-theme="light"]) {
+    color-scheme: dark;
     --bg-app: #0F1117;
     --bg-surface: #181B23;
     --bg-surface-elevated: #222634;
@@ -76,4 +107,32 @@
     --color-today-bg: #3F2415;
     --color-success-bg: #143823;
   }
+}
+
+/* Explicit Dark Mode Override */
+:root[data-theme="dark"],
+[data-theme="dark"] {
+  color-scheme: dark;
+  --bg-app: #0F1117;
+  --bg-surface: #181B23;
+  --bg-surface-elevated: #222634;
+  --bg-surface-hover: #2A2F40;
+  --bg-rail: #111319;
+
+  --text-primary: #F3F4F6;
+  --text-secondary: #9CA3AF;
+  --text-muted: #6B7280;
+  --text-on-dark: #F9FAFB;
+  --text-gold: #FDD54F;
+
+  --border-color: #2D3344;
+  --border-color-subtle: #232736;
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.4);
+
+  --color-assignment-bg: #1E293B;
+  --color-quiz-bg: #3B2A15;
+  --color-overdue-bg: #3F1D1D;
+  --color-today-bg: #3F2415;
+  --color-success-bg: #143823;
 }

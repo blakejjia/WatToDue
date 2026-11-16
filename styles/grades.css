@@ -610,69 +610,109 @@
    Dark Mode Overrides
    ========================================================================== */
 @media (prefers-color-scheme: dark) {
-  .hero-badge-tile {
+  :root:not([data-theme="light"]) .hero-badge-tile {
     background: linear-gradient(135deg, #422006 0%, #78350f 100%);
     border-color: #92400e;
   }
-  .hero-badge-subj {
+  :root:not([data-theme="light"]) .hero-badge-subj {
     color: #fef3c7;
   }
-  .hero-badge-num {
+  :root:not([data-theme="light"]) .hero-badge-num {
     color: #fde68a;
   }
-  .grades-data-table thead {
+  :root:not([data-theme="light"]) .grades-data-table thead {
     background-color: #12151c;
   }
-  .table-category-row {
+  :root:not([data-theme="light"]) .table-category-row {
     background-color: #161a24;
   }
-  .table-category-row:hover {
+  :root:not([data-theme="light"]) .table-category-row:hover {
     background-color: #1e2433 !important;
   }
-  .category-pill {
+  :root:not([data-theme="light"]) .category-pill {
     background-color: rgba(253, 213, 79, 0.15);
     color: var(--uw-gold);
     border-color: var(--uw-gold-dark);
   }
-  .grades-data-table th {
+  :root:not([data-theme="light"]) .grades-data-table th {
     color: #9ca3af;
     border-color: #2e3547;
   }
-  .grades-data-table td {
+  :root:not([data-theme="light"]) .grades-data-table td {
     border-color: #222838;
   }
-  .table-item-name {
+  :root:not([data-theme="light"]) .table-item-name {
     color: #f3f4f6;
   }
-  .grade-card-item {
+  :root:not([data-theme="light"]) .grade-card-item {
     background-color: var(--bg-surface);
     border-color: #2e3547;
   }
-  .grade-card-item:hover {
+  :root:not([data-theme="light"]) .grade-card-item:hover {
     border-color: #475569;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
   }
-  .course-tab-pill {
+  :root:not([data-theme="light"]) .course-tab-pill {
     background-color: var(--bg-surface);
     border-color: #2e3547;
     color: #cbd5e1;
   }
-  .course-tab-pill:hover {
+  :root:not([data-theme="light"]) .course-tab-pill:hover {
     background-color: #222838;
     color: #f3f4f6;
     border-color: #475569;
   }
-  .filter-btn {
+  :root:not([data-theme="light"]) .filter-btn {
     border-color: #2e3547;
     color: #9ca3af;
   }
-  .filter-btn:hover {
+  :root:not([data-theme="light"]) .filter-btn:hover {
     background-color: #222838;
     color: #f3f4f6;
   }
-  .filter-btn.active {
+  :root:not([data-theme="light"]) .filter-btn.active {
     background-color: #1e2433;
     border-color: var(--uw-gold);
     color: #f3f4f6;
   }
 }
+
+:root[data-theme="dark"] .hero-badge-tile,
+[data-theme="dark"] .hero-badge-tile {
+  background: linear-gradient(135deg, #422006 0%, #78350f 100%);
+  border-color: #92400e;
+}
+:root[data-theme="dark"] .hero-badge-subj,
+[data-theme="dark"] .hero-badge-subj { color: #fef3c7; }
+:root[data-theme="dark"] .hero-badge-num,
+[data-theme="dark"] .hero-badge-num { color: #fde68a; }
+:root[data-theme="dark"] .grades-data-table thead,
+[data-theme="dark"] .grades-data-table thead { background-color: #12151c; }
+:root[data-theme="dark"] .table-category-row,
+[data-theme="dark"] .table-category-row { background-color: #161a24; }
+:root[data-theme="dark"] .table-category-row:hover,
+[data-theme="dark"] .table-category-row:hover { background-color: #1e2433 !important; }
+:root[data-theme="dark"] .category-pill,
+[data-theme="dark"] .category-pill {
+  background-color: rgba(253, 213, 79, 0.15);
+  color: var(--uw-gold);
+  border-color: var(--uw-gold-dark);
+}
+:root[data-theme="dark"] .grades-data-table th,
+[data-theme="dark"] .grades-data-table th { color: #9ca3af; border-color: #2e3547; }
+:root[data-theme="dark"] .grades-data-table td,
+[data-theme="dark"] .grades-data-table td { border-color: #222838; }
+:root[data-theme="dark"] .table-item-name,
+[data-theme="dark"] .table-item-name { color: #f3f4f6; }
+:root[data-theme="dark"] .grade-card-item,
+[data-theme="dark"] .grade-card-item { background-color: var(--bg-surface); border-color: #2e3547; }
+:root[data-theme="dark"] .course-tab-pill,
+[data-theme="dark"] .course-tab-pill { background-color: var(--bg-surface); border-color: #2e3547; color: #cbd5e1; }
+:root[data-theme="dark"] .course-tab-pill:hover,
+[data-theme="dark"] .course-tab-pill:hover { background-color: #222838; color: #f3f4f6; border-color: #475569; }
+:root[data-theme="dark"] .filter-btn,
+[data-theme="dark"] .filter-btn { border-color: #2e3547; color: #9ca3af; }
+:root[data-theme="dark"] .filter-btn:hover,
+[data-theme="dark"] .filter-btn:hover { background-color: #222838; color: #f3f4f6; }
+:root[data-theme="dark"] .filter-btn.active,
+[data-theme="dark"] .filter-btn.active { background-color: #1e2433; border-color: var(--uw-gold); color: #f3f4f6; }

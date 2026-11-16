@@ -41,11 +41,18 @@ class DashboardController {
     if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
       chrome.storage.onChanged.addListener(async (changes, area) => {
         if (area === 'local') {
+          if (changes.theme) {
+            this.applyTheme(changes.theme.newValue);
+          }
           await this.loadCache();
           this.renderCurrentView();
         }
       });
     }
+
+    // Apply saved theme immediately
+    const savedTheme = await storageManager.get('theme', 'auto');
+    this.applyTheme(savedTheme);
 
     // 1. Instant render from local storage
     await this.loadCache();
@@ -162,6 +169,14 @@ class DashboardController {
 
     if (typeof window !== 'undefined' && window.lucide) {
       window.lucide.createIcons();
+    }
+  }
+
+  applyTheme(theme) {
+    if (theme && theme !== 'auto') {
+      document.documentElement.setAttribute('data-theme', theme);
+    } else {
+      document.documentElement.removeAttribute('data-theme');
     }
   }
 }
