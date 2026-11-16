@@ -146,3 +146,77 @@ test('normalizeDues marks dropboxes and quizzes completed from submission and at
   assert.strictEqual(qDecl.completed, true);
   assert.strictEqual(qDecl.autoCompleted, true);
 });
+
+test('normalizeGrades correctly classifies GradeObjectType 9 as category and nests children', () => {
+  const rawGrades = [
+    {
+      GradeObjectIdentifier: '100',
+      GradeObjectName: 'Crowdmark Assessments',
+      GradeObjectType: 9,
+      GradeObjectTypeName: 'Category',
+      PointsNumerator: 82,
+      PointsDenominator: 100,
+      WeightedNumerator: 8.2,
+      WeightedDenominator: 10
+    },
+    {
+      GradeObjectIdentifier: '101',
+      GradeObjectName: 'Problem Set 1',
+      GradeObjectType: 1,
+      GradeObjectTypeName: 'Numeric',
+      PointsNumerator: 10.5,
+      PointsDenominator: 11,
+      WeightedNumerator: 19.1,
+      WeightedDenominator: 20
+    },
+    {
+      GradeObjectIdentifier: '102',
+      GradeObjectName: 'Problem Set 2',
+      GradeObjectType: 1,
+      GradeObjectTypeName: 'Numeric',
+      PointsNumerator: 10.75,
+      PointsDenominator: 16,
+      WeightedNumerator: 13.4,
+      WeightedDenominator: 20
+    },
+    {
+      GradeObjectIdentifier: '200',
+      GradeObjectName: 'Tests',
+      GradeObjectType: 9,
+      GradeObjectTypeName: 'Category',
+      PointsNumerator: 60,
+      PointsDenominator: 100,
+      WeightedNumerator: 27,
+      WeightedDenominator: 45
+    },
+    {
+      GradeObjectIdentifier: '201',
+      GradeObjectName: 'Test #1',
+      GradeObjectType: 1,
+      GradeObjectTypeName: 'Numeric',
+      PointsNumerator: 13.8,
+      PointsDenominator: 15,
+      WeightedNumerator: 30.7,
+      WeightedDenominator: 33.3
+    }
+  ];
+
+  const normalized = normalizeGrades(rawGrades);
+  assert.strictEqual(normalized.length, 5);
+  assert.strictEqual(normalized[0].isCategory, true);
+  assert.strictEqual(normalized[0].name, 'Crowdmark Assessments');
+  assert.strictEqual(normalized[0].categoryId, null);
+
+  assert.strictEqual(normalized[1].isCategory, false);
+  assert.strictEqual(normalized[1].name, 'Problem Set 1');
+  assert.strictEqual(normalized[1].categoryId, '100');
+  assert.strictEqual(normalized[1].categoryName, 'Crowdmark Assessments');
+
+  assert.strictEqual(normalized[2].categoryId, '100');
+
+  assert.strictEqual(normalized[3].isCategory, true);
+  assert.strictEqual(normalized[3].name, 'Tests');
+
+  assert.strictEqual(normalized[4].categoryId, '200');
+  assert.strictEqual(normalized[4].categoryName, 'Tests');
+});

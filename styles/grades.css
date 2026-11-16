@@ -348,6 +348,99 @@
   vertical-align: middle;
 }
 
+/* Category Header / 总分 Row */
+.table-category-row {
+  background-color: var(--bg-app);
+  cursor: pointer;
+  user-select: none;
+}
+
+.table-category-row:hover {
+  background-color: var(--bg-surface-hover) !important;
+}
+
+.table-category-row td {
+  padding-top: 13px;
+  padding-bottom: 13px;
+  border-bottom: 1px solid var(--border-color);
+  border-top: 1px solid var(--border-color);
+  font-weight: 700;
+}
+
+.category-row-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.category-toggle-icon {
+  font-size: 10px;
+  color: var(--text-muted);
+  width: 14px;
+  display: inline-block;
+  transition: transform 0.15s ease;
+}
+
+.category-icon {
+  font-size: 13px;
+}
+
+.category-title {
+  font-size: 13.5px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+}
+
+.category-pill {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 4px;
+  background-color: var(--uw-gold-light);
+  color: var(--uw-gold-dark);
+  border: 1px solid var(--uw-gold);
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+.category-weight-bold {
+  font-family: var(--font-mono);
+  font-weight: 800;
+  font-size: 13.5px;
+  color: var(--text-primary);
+}
+
+.category-percent-badge {
+  font-weight: 800 !important;
+  font-size: 13px !important;
+}
+
+/* Child / Sub-Item Rows */
+.table-child-row.is-indented td.col-name {
+  padding-left: 12px;
+}
+
+.child-item-name-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 14px;
+}
+
+.tree-connector {
+  color: var(--text-muted);
+  font-size: 13px;
+  opacity: 0.6;
+  user-select: none;
+}
+
+/* Category Card */
+.is-category-card {
+  background: linear-gradient(135deg, var(--bg-surface-hover) 0%, var(--bg-surface) 100%);
+  border-left: 4px solid var(--uw-gold) !important;
+}
+
 .grades-data-table tbody tr:last-child td {
   border-bottom: none;
 }
@@ -529,6 +622,17 @@
   }
   .grades-data-table thead {
     background-color: #12151c;
+  }
+  .table-category-row {
+    background-color: #161a24;
+  }
+  .table-category-row:hover {
+    background-color: #1e2433 !important;
+  }
+  .category-pill {
+    background-color: rgba(253, 213, 79, 0.15);
+    color: var(--uw-gold);
+    border-color: var(--uw-gold-dark);
   }
   .grades-data-table th {
     color: #9ca3af;

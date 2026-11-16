@@ -117,33 +117,50 @@ export function normalizeGrades(rawGrades) {
     return [];
   }
 
+  let currentCategoryId = null;
+  let currentCategoryName = null;
+
   return rawGrades.map((item) => {
-    const score = typeof item.PointsNumerator === 'number' ? item.PointsNumerator : null;
-    const maxScore = typeof item.PointsDenominator === 'number' ? item.PointsDenominator : null;
+    const isCategory = item.GradeObjectType === 9 || item.GradeObjectTypeName === 'Category' || item.type === 9 || item.type === 'Category';
+    const itemId = String(item.GradeObjectIdentifier || item.Id || Math.random());
+    const itemName = item.GradeObjectName || item.name || 'Grade Item';
+
+    if (isCategory) {
+      currentCategoryId = itemId;
+      currentCategoryName = itemName;
+    }
+
+    const score = typeof item.PointsNumerator === 'number' ? item.PointsNumerator : (typeof item.score === 'number' ? item.score : null);
+    const maxScore = typeof item.PointsDenominator === 'number' ? item.PointsDenominator : (typeof item.maxScore === 'number' ? item.maxScore : null);
     const percent = score !== null && maxScore !== null && maxScore > 0
       ? Math.round((score / maxScore) * 1000) / 10
-      : null;
+      : (typeof item.percent === 'number' ? item.percent : null);
 
-    const weightedScore = typeof item.WeightedNumerator === 'number' ? item.WeightedNumerator : null;
-    const weightedMax = typeof item.WeightedDenominator === 'number' ? item.WeightedDenominator : null;
+    const weightedScore = typeof item.WeightedNumerator === 'number' ? item.WeightedNumerator : (typeof item.weightedScore === 'number' ? item.weightedScore : null);
+    const weightedMax = typeof item.WeightedDenominator === 'number' ? item.WeightedDenominator : (typeof item.weightedMax === 'number' ? item.weightedMax : null);
 
     let comment = null;
     if (item.Comments?.Text) {
       comment = item.Comments.Text;
     } else if (typeof item.Comments === 'string') {
       comment = item.Comments;
+    } else if (typeof item.comment === 'string') {
+      comment = item.comment;
     }
 
     return {
-      id: String(item.GradeObjectIdentifier || item.Id || Math.random()),
-      name: item.GradeObjectName || 'Grade Item',
-      type: item.GradeObjectType || 'Numeric',
+      id: itemId,
+      name: itemName,
+      type: item.GradeObjectType || (isCategory ? 'Category' : 'Numeric'),
+      isCategory,
+      categoryId: isCategory ? null : currentCategoryId,
+      categoryName: isCategory ? null : currentCategoryName,
       score,
       maxScore,
       percent,
       weightedScore,
       weightedMax,
-      displayedGrade: item.DisplayedGrade || null,
+      displayedGrade: item.DisplayedGrade || item.displayedGrade || null,
       comment,
     };
   });

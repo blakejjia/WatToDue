@@ -116,6 +116,7 @@ export function isDueCompletedByGrade(due, courseGrades) {
   }
 
   for (const grade of courseGrades) {
+    if (grade.isCategory) continue; // Skip category header items
     const gradeName = grade.name || grade.GradeObjectName;
     if (isTitleMatch(due.title, gradeName) && isGradeCompleted(grade)) {
       return true;
