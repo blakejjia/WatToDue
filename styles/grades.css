@@ -1,26 +1,31 @@
-/* Grades View Container */
+/* ==========================================================================
+   WatToDue Grades View - Modern, Clean & High-Density Gradebook Styles
+   ========================================================================== */
+
 .grades-container {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 18px;
+  width: 100%;
 }
 
-/* Course Tabs Strip */
+/* ==========================================================================
+   1. Course Tabs Strip (Horizontal Scrollable, Modern Tablist)
+   ========================================================================== */
 .course-tabs-strip {
   display: flex;
-  gap: 6px;
+  align-items: center;
+  gap: 8px;
   overflow-x: auto;
-  padding-bottom: 4px;
+  padding: 2px 2px 8px 2px;
   user-select: none;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+  -webkit-overflow-scrolling: touch;
 }
 
 .course-tabs-strip::-webkit-scrollbar {
-  height: 4px;
-}
-
-.course-tabs-strip::-webkit-scrollbar-thumb {
-  background-color: var(--border-color);
-  border-radius: 2px;
+  display: none; /* Chrome/Safari */
 }
 
 .course-tab-pill {
@@ -28,150 +33,542 @@
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
   font-family: inherit;
-  font-size: 11px;
+  font-size: 12.5px;
   font-weight: 600;
-  padding: 6px 12px;
+  padding: 7px 14px;
   border-radius: var(--border-radius-full);
   cursor: pointer;
   white-space: nowrap;
-  transition: all 0.15s;
+  flex: none; /* Never shrink */
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  transition: all 0.15s ease-in-out;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
 }
 
 .course-tab-pill:hover {
   background-color: var(--bg-surface-hover);
   color: var(--text-primary);
+  border-color: #cbd5e1;
 }
 
 .course-tab-pill.active {
   background-color: var(--uw-gold);
   border-color: var(--uw-gold-dark);
-  color: var(--uw-black);
-  box-shadow: 0 1px 4px rgba(253, 213, 79, 0.4);
+  color: #111827;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(212, 160, 23, 0.35);
 }
 
-/* Course Grade Summary Card */
-.course-summary-card {
+.tab-course-code {
+  letter-spacing: -0.1px;
+}
+
+.tab-items-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.07);
+}
+
+.course-tab-pill.active .tab-items-badge {
+  background-color: rgba(0, 0, 0, 0.14);
+  color: #111827;
+}
+
+/* ==========================================================================
+   2. Course Hero Summary Card
+   ========================================================================== */
+.grades-hero-card {
   background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-surface-elevated) 100%);
   border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-lg);
-  padding: 14px 16px;
+  border-radius: 18px;
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03), 0 1px 3px rgba(0, 0, 0, 0.02);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hero-card-top {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: var(--shadow-sm);
+  gap: 20px;
+  flex-wrap: wrap;
 }
 
-.course-summary-info {
+/* Left: Course thumbnail badge + details */
+.hero-course-group {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.hero-badge-tile {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 60%, #fde68a 100%);
+  border: 1px solid #fde68a;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
 }
 
-.course-summary-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.course-summary-code {
-  font-size: 11px;
-  color: var(--text-muted);
-}
-
-.course-summary-stats {
-  text-align: right;
-}
-
-.course-summary-score {
-  font-size: 20px;
+.hero-badge-subj {
+  font-size: 13px;
   font-weight: 800;
-  color: var(--uw-gold-dark);
+  color: #1e293b;
   line-height: 1.1;
+  letter-spacing: -0.2px;
 }
 
-.course-summary-items-count {
-  font-size: 11px;
-  color: var(--text-secondary);
+.hero-badge-num {
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  line-height: 1.1;
+  margin-top: 2px;
 }
 
-/* Grade Items List */
-.grade-items-list {
+.hero-course-details {
   display: flex;
   flex-direction: column;
+  gap: 2px;
+}
+
+.hero-course-name {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0;
+  letter-spacing: -0.3px;
+}
+
+.hero-course-code {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.hero-meta-chips {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  flex-wrap: wrap;
+}
+
+.hero-chip {
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background-color: var(--bg-app);
+  color: var(--text-secondary);
+  border: 1px solid var(--border-color-subtle);
+}
+
+/* Right: Overall score & letter grade */
+.hero-grade-score-group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+}
+
+.hero-grade-row {
+  display: flex;
+  align-items: center;
   gap: 8px;
 }
 
-.grade-item-card {
+.hero-score-val {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--uw-gold-dark);
+  line-height: 1;
+  letter-spacing: -0.5px;
+}
+
+.hero-letter-badge {
+  font-size: 13px;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: 6px;
+  letter-spacing: 0.2px;
+}
+
+.hero-score-sub {
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+/* Progress Bar across the card */
+.hero-progress-track {
+  width: 100%;
+  height: 6px;
+  background-color: var(--bg-app);
+  border-radius: 9999px;
+  overflow: hidden;
+  border: 1px solid var(--border-color-subtle);
+}
+
+.hero-progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.4s ease-in-out;
+}
+
+/* ==========================================================================
+   3. Filter Toolbar & View Mode Switcher
+   ========================================================================== */
+.grades-filter-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.filter-pills-group {
+  display: inline-flex;
+  gap: 6px;
+}
+
+.filter-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-sm);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 11.5px;
+  font-weight: 600;
+  padding: 5px 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.filter-btn:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.filter-btn.active {
+  background-color: var(--bg-surface);
+  border-color: var(--uw-gold-dark);
+  color: var(--text-primary);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+
+.grades-filter-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.grades-search-input {
   background-color: var(--bg-surface);
   border: 1px solid var(--border-color);
-  border-radius: var(--border-radius-md);
-  padding: 10px 14px;
+  border-radius: var(--border-radius-sm);
+  padding: 5px 12px;
+  font-size: 12px;
+  color: var(--text-primary);
+  outline: none;
+  width: 200px;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.grades-search-input:focus {
+  border-color: var(--uw-gold-dark);
+  box-shadow: 0 0 0 2px rgba(253, 213, 79, 0.25);
+}
+
+/* ==========================================================================
+   4. High-Density Responsive Data Table
+   ========================================================================== */
+.table-wrapper {
+  overflow: auto;
+  max-inline-size: 100%;
+  border-radius: 14px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.grades-data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+}
+
+/* Sticky Header */
+.grades-data-table thead {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  background-color: var(--bg-app);
+}
+
+.grades-data-table th {
+  padding: 12px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border-color);
+  white-space: nowrap;
+}
+
+.grades-data-table tbody tr {
+  transition: background-color 0.12s ease;
+}
+
+.grades-data-table tbody tr:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+.grades-data-table tbody tr.is-ungraded {
+  opacity: 0.72;
+}
+
+.grades-data-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color-subtle);
+  vertical-align: middle;
+}
+
+.grades-data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Column specific styles */
+.col-name {
+  max-width: 320px;
+}
+
+.table-item-name {
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.35;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.table-weight-pill {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 6px;
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.table-score-bold {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 13px;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.table-dash {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+.table-percent-box {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 3px;
+}
+
+.table-percent-badge {
+  font-size: 12px;
+  font-weight: 700;
+  padding: 1.5px 7px;
+  border-radius: 6px;
+  letter-spacing: -0.1px;
+  display: inline-block;
+}
+
+.table-mini-bar-track {
+  width: 64px;
+  height: 4px;
+  background-color: var(--border-color-subtle);
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.table-mini-bar-fill {
+  height: 100%;
+  border-radius: 9999px;
+}
+
+.table-feedback-text {
+  font-size: 11.5px;
+  color: var(--text-secondary);
+  font-style: italic;
+  max-width: 240px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ==========================================================================
+   5. Card Grid View Layout
+   ========================================================================== */
+.grades-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 14px;
+}
+
+.grade-card-item {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
   gap: 6px;
   box-shadow: var(--shadow-sm);
-  transition: border-color 0.15s;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
-.grade-item-card:hover {
-  border-color: var(--border-color);
-  box-shadow: var(--shadow-md);
+.grade-card-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  border-color: #cbd5e1;
 }
 
-.grade-item-header {
+.grade-card-item.is-ungraded {
+  opacity: 0.72;
+}
+
+.grade-card-top {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
   gap: 8px;
 }
 
-.grade-item-name {
-  font-size: 13px;
-  font-weight: 600;
+.grade-card-title {
+  font-size: 14px;
+  font-weight: 700;
   color: var(--text-primary);
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
   flex: 1;
 }
 
-.grade-score-group {
-  text-align: right;
+.grade-card-percent-badge {
+  font-size: 12px;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 6px;
   flex-shrink: 0;
 }
 
-.grade-score-primary {
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--text-primary);
-}
-
-.grade-score-percent {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-success);
-}
-
-.grade-item-meta {
+.grade-card-meta-row {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
-  font-size: 11px;
+  margin-top: 4px;
+}
+
+.grade-card-score-text {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  font-weight: 700;
   color: var(--text-secondary);
 }
 
-.grade-weight-badge {
-  background-color: var(--bg-app);
-  border: 1px solid var(--border-color);
-  padding: 1px 6px;
-  border-radius: var(--border-radius-sm);
-  font-size: 10px;
-}
-
-/* Teacher Feedback Comment */
 .grade-comment-box {
   background-color: var(--bg-app);
   border-left: 3px solid var(--uw-gold-dark);
   padding: 6px 10px;
   border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
-  font-size: 11px;
+  font-size: 11.5px;
   color: var(--text-secondary);
   font-style: italic;
-  margin-top: 4px;
+}
+
+/* ==========================================================================
+   Dark Mode Overrides
+   ========================================================================== */
+@media (prefers-color-scheme: dark) {
+  .hero-badge-tile {
+    background: linear-gradient(135deg, #422006 0%, #78350f 100%);
+    border-color: #92400e;
+  }
+  .hero-badge-subj {
+    color: #fef3c7;
+  }
+  .hero-badge-num {
+    color: #fde68a;
+  }
+  .grades-data-table thead {
+    background-color: #12151c;
+  }
+  .grades-data-table th {
+    color: #9ca3af;
+    border-color: #2e3547;
+  }
+  .grades-data-table td {
+    border-color: #222838;
+  }
+  .table-item-name {
+    color: #f3f4f6;
+  }
+  .grade-card-item {
+    background-color: var(--bg-surface);
+    border-color: #2e3547;
+  }
+  .grade-card-item:hover {
+    border-color: #475569;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+  }
+  .course-tab-pill {
+    background-color: var(--bg-surface);
+    border-color: #2e3547;
+    color: #cbd5e1;
+  }
+  .course-tab-pill:hover {
+    background-color: #222838;
+    color: #f3f4f6;
+    border-color: #475569;
+  }
+  .filter-btn {
+    border-color: #2e3547;
+    color: #9ca3af;
+  }
+  .filter-btn:hover {
+    background-color: #222838;
+    color: #f3f4f6;
+  }
+  .filter-btn.active {
+    background-color: #1e2433;
+    border-color: var(--uw-gold);
+    color: #f3f4f6;
+  }
 }
