@@ -1,0 +1,79 @@
+:root {
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+  /* UWaterloo Brand Tokens */
+  --uw-gold: #FDD54F;
+  --uw-gold-dark: #D4A017;
+  --uw-gold-light: #FFF8E1;
+  --uw-black: #1E1E1E;
+  --uw-charcoal: #2A2A2A;
+
+  /* Surface and Backgrounds */
+  --bg-app: #F8F9FA;
+  --bg-surface: #FFFFFF;
+  --bg-surface-elevated: #FFFFFF;
+  --bg-surface-hover: #F1F3F5;
+  --bg-rail: #1E1E1E;
+
+  /* Text Colors */
+  --text-primary: #1F2937;
+  --text-secondary: #4B5563;
+  --text-muted: #9CA3AF;
+  --text-on-dark: #F9FAFB;
+  --text-gold: #B45309;
+
+  /* Borders & Shadows */
+  --border-color: #E5E7EB;
+  --border-color-subtle: #F3F4F6;
+  --border-radius-sm: 6px;
+  --border-radius-md: 10px;
+  --border-radius-lg: 14px;
+  --border-radius-full: 9999px;
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+
+  /* Semantic Status Colors */
+  --color-assignment: #2563EB;
+  --color-assignment-bg: #EFF6FF;
+  --color-quiz: #D97706;
+  --color-quiz-bg: #FEF3C7;
+  --color-overdue: #DC2626;
+  --color-overdue-bg: #FEE2E2;
+  --color-today: #EA580C;
+  --color-today-bg: #FFEDD5;
+  --color-success: #16A34A;
+  --color-success-bg: #DCFCE7;
+
+  /* Sizing */
+  --rail-width: 64px;
+  --header-height: 52px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg-app: #0F1117;
+    --bg-surface: #181B23;
+    --bg-surface-elevated: #222634;
+    --bg-surface-hover: #2A2F40;
+    --bg-rail: #111319;
+
+    --text-primary: #F3F4F6;
+    --text-secondary: #9CA3AF;
+    --text-muted: #6B7280;
+    --text-on-dark: #F9FAFB;
+    --text-gold: #FDD54F;
+
+    --border-color: #2D3344;
+    --border-color-subtle: #232736;
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 8px -1px rgba(0, 0, 0, 0.4);
+
+    --color-assignment-bg: #1E293B;
+    --color-quiz-bg: #3B2A15;
+    --color-overdue-bg: #3F1D1D;
+    --color-today-bg: #3F2415;
+    --color-success-bg: #143823;
+  }
+}

@@ -1,0 +1,201 @@
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  text-decoration: none;
+  line-height: 1.2;
+}
+
+.btn-primary {
+  background-color: var(--uw-gold);
+  color: var(--uw-black);
+  border-color: var(--uw-gold-dark);
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background-color: #FACC15;
+}
+
+.btn-secondary {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  border-color: var(--border-color);
+}
+
+.btn-secondary:hover {
+  background-color: var(--bg-surface-hover);
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 11px;
+}
+
+.btn-icon {
+  padding: 6px;
+  border-radius: var(--border-radius-sm);
+}
+
+/* Badges & Pills */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  font-size: 10px;
+  font-weight: 600;
+  border-radius: var(--border-radius-full);
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.badge-assignment {
+  background-color: var(--color-assignment-bg);
+  color: var(--color-assignment);
+}
+
+.badge-quiz {
+  background-color: var(--color-quiz-bg);
+  color: var(--color-quiz);
+}
+
+.badge-overdue {
+  background-color: var(--color-overdue-bg);
+  color: var(--color-overdue);
+}
+
+.badge-today {
+  background-color: var(--color-today-bg);
+  color: var(--color-today);
+}
+
+.badge-success {
+  background-color: var(--color-success-bg);
+  color: var(--color-success);
+}
+
+/* Segmented Control / Pill Group */
+.segmented-control {
+  display: inline-flex;
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-color);
+  padding: 2px;
+  border-radius: var(--border-radius-sm);
+}
+
+.segmented-control button {
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.segmented-control button.active {
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  font-weight: 600;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Dropdown / Select */
+.select-input {
+  font-family: inherit;
+  font-size: 12px;
+  padding: 5px 8px;
+  border-radius: var(--border-radius-sm);
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-surface);
+  color: var(--text-primary);
+  cursor: pointer;
+  outline: none;
+}
+
+.select-input:focus {
+  border-color: var(--uw-gold-dark);
+}
+
+/* Spinner */
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top-color: var(--uw-gold-dark);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state-icon {
+  font-size: 36px;
+  margin-bottom: 12px;
+  opacity: 0.8;
+}
+
+.empty-state-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.empty-state-desc {
+  font-size: 12px;
+  max-width: 260px;
+  margin-bottom: 16px;
+}
+
+/* Banner Prompt (e.g. Needs Login) */
+.banner {
+  padding: 10px 14px;
+  border-radius: var(--border-radius-md);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 12px;
+}
+
+.banner-warning {
+  background-color: var(--color-quiz-bg);
+  border: 1px solid #FCD34D;
+  color: #78350F;
+}
+
+.banner-error {
+  background-color: var(--color-overdue-bg);
+  border: 1px solid #FCA5A5;
+  color: #7F1D1D;
+}
