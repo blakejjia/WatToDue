@@ -104,3 +104,45 @@ test('normalizeDues automatically completes items matching scored grades', () =>
   // Quiz 9 is ungraded -> remains uncompleted
   assert.strictEqual(quiz9.completed, false);
 });
+
+test('normalizeDues marks dropboxes and quizzes completed from submission and attempt sets', () => {
+  const courses = [
+    { id: 300, displayName: 'BIOL 266', code: '1269-BIOL.266.001.1.LEC', termCode: '1269' }
+  ];
+  const dropboxesMap = {
+    300: [
+      { Id: 501, Name: 'Assignment 1', DueDate: '2026-09-26T03:59:59.000Z' },
+      { Id: 502, Name: 'Assignment 7', DueDate: '2026-11-27T03:59:59.000Z' }
+    ]
+  };
+  const quizzesMap = {
+    300: [
+      { QuizId: 601, Name: 'CHEM 494 Declarations', DueDate: '2026-10-02T03:59:59.000Z' }
+    ]
+  };
+
+  const submittedDbMap = { 300: new Set([501]) };
+  const completedQzMap = { 300: new Set([601]) };
+
+  const dues = normalizeDues(
+    courses,
+    dropboxesMap,
+    quizzesMap,
+    new Set(),
+    {},
+    submittedDbMap,
+    completedQzMap
+  );
+
+  const a1 = dues.find((d) => d.rawId === 501);
+  const a7 = dues.find((d) => d.rawId === 502);
+  const qDecl = dues.find((d) => d.rawId === 601);
+
+  assert.strictEqual(a1.completed, true);
+  assert.strictEqual(a1.autoCompleted, true);
+
+  assert.strictEqual(a7.completed, false);
+
+  assert.strictEqual(qDecl.completed, true);
+  assert.strictEqual(qDecl.autoCompleted, true);
+});

@@ -11,6 +11,8 @@ import { isDueCompletedByGrade } from './completion-matcher.js';
  * @param {Record<number, Array<object>>} quizzesMap
  * @param {Set<string>|Array<string>} completedIds
  * @param {Record<number, Array<object>>} [gradesMap={}]
+ * @param {Record<number, Set<number>>} [submittedDropboxesMap={}]
+ * @param {Record<number, Set<number>>} [completedQuizzesMap={}]
  * @returns {Array<object>}
  */
 export function normalizeDues(
@@ -18,7 +20,9 @@ export function normalizeDues(
   dropboxesMap = {},
   quizzesMap = {},
   completedIds = new Set(),
-  gradesMap = {}
+  gradesMap = {},
+  submittedDropboxesMap = {},
+  completedQuizzesMap = {}
 ) {
   const completedSet = completedIds instanceof Set ? completedIds : new Set(completedIds || []);
   const dues = [];
@@ -36,13 +40,15 @@ export function normalizeDues(
     const course = courseLookup.get(courseId);
     if (!Array.isArray(items)) continue;
     const courseGrades = gradesMap[courseId] || [];
+    const submittedSet = submittedDropboxesMap[courseId] || new Set();
 
     for (const item of items) {
       if (!item || !item.DueDate) continue; // Skip undated items
       const id = `dropbox-${item.Id}`;
       const title = item.Name || 'Assignment';
       const gradeCompleted = isDueCompletedByGrade({ title }, courseGrades);
-      const isCompleted = completedSet.has(id) || gradeCompleted;
+      const isSubmitted = submittedSet.has(item.Id);
+      const isCompleted = completedSet.has(id) || gradeCompleted || Boolean(isSubmitted);
 
       dues.push({
         id,
@@ -57,7 +63,7 @@ export function normalizeDues(
         customInstructions: item.CustomInstructions?.Text || null,
         url: Endpoints.dropboxSubmissionUrl(courseId, item.Id),
         completed: isCompleted,
-        autoCompleted: gradeCompleted,
+        autoCompleted: gradeCompleted || isSubmitted,
       });
     }
   }
@@ -68,13 +74,15 @@ export function normalizeDues(
     const course = courseLookup.get(courseId);
     if (!Array.isArray(items)) continue;
     const courseGrades = gradesMap[courseId] || [];
+    const completedQuizSet = completedQuizzesMap[courseId] || new Set();
 
     for (const item of items) {
       if (!item || !item.DueDate) continue; // Skip undated quizzes
       const id = `quiz-${item.QuizId}`;
       const title = item.Name || 'Quiz';
       const gradeCompleted = isDueCompletedByGrade({ title }, courseGrades);
-      const isCompleted = completedSet.has(id) || gradeCompleted;
+      const isAttempted = completedQuizSet.has(item.QuizId);
+      const isCompleted = completedSet.has(id) || gradeCompleted || Boolean(isAttempted);
 
       dues.push({
         id,
@@ -90,7 +98,7 @@ export function normalizeDues(
         endDate: item.EndDate || null,
         url: Endpoints.quizSummaryUrl(courseId, item.QuizId),
         completed: isCompleted,
-        autoCompleted: gradeCompleted,
+        autoCompleted: gradeCompleted || isAttempted,
       });
     }
   }
@@ -207,62 +215,44 @@ export class SyncService {
     const dropboxesMap = {};
     const quizzesMap = {};
     const gradesMap = {};
+    const submittedDropboxesMap = {};
+    const completedQuizzesMap = {};
 
     await Promise.all(
       targetCourses.map(async (course) => {
         try {
-          const [db, qz, gr] = await Promise.all([
+          const [db, qz, gr, subDb, compQz] = await Promise.all([
             this.client.getDropboxes(course.id).catch(() => []),
             this.client.getQuizzes(course.id).catch(() => []),
             this.client.getGrades(course.id).catch(() => []),
+            this.client.getSubmittedDropboxFolderIds(course.id).catch(() => new Set()),
+            this.client.getCompletedQuizIds(course.id).catch(() => new Set()),
           ]);
           dropboxesMap[course.id] = db;
           quizzesMap[course.id] = qz;
           gradesMap[course.id] = normalizeGrades(gr);
+          submittedDropboxesMap[course.id] = subDb;
+          completedQuizzesMap[course.id] = compQz;
         } catch (_) {
           dropboxesMap[course.id] = [];
           quizzesMap[course.id] = [];
           gradesMap[course.id] = [];
+          submittedDropboxesMap[course.id] = new Set();
+          completedQuizzesMap[course.id] = new Set();
         }
       })
     );
 
     const completedIds = await storageManager.get('completedDueIds', []);
-    const dues = normalizeDues(targetCourses, dropboxesMap, quizzesMap, completedIds, gradesMap);
-
-    // Opportunistically check past-due items to see if submissions or attempts exist
-    const nowTime = Date.now();
-    const uncompletedPastItems = dues.filter(
-      (d) => !d.completed && new Date(d.dueDate).getTime() < nowTime
+    const dues = normalizeDues(
+      targetCourses,
+      dropboxesMap,
+      quizzesMap,
+      completedIds,
+      gradesMap,
+      submittedDropboxesMap,
+      completedQuizzesMap
     );
-
-    if (uncompletedPastItems.length > 0) {
-      // Chunk check to avoid rate-limiting
-      await Promise.all(
-        uncompletedPastItems.slice(0, 15).map(async (due) => {
-          try {
-            if (due.type === 'assignment') {
-              const subs = await this.client.getDropboxSubmissions(due.courseId, due.rawId);
-              const hasSubmissions = subs.some(
-                (s) => Array.isArray(s.Submissions) && s.Submissions.length > 0
-              );
-              if (hasSubmissions) {
-                due.completed = true;
-                due.autoCompleted = true;
-              }
-            } else if (due.type === 'quiz') {
-              const attempts = await this.client.getQuizAttempts(due.courseId, due.rawId);
-              if (Array.isArray(attempts) && attempts.length > 0) {
-                due.completed = true;
-                due.autoCompleted = true;
-              }
-            }
-          } catch (_) {
-            // Ignore individual probe failures
-          }
-        })
-      );
-    }
 
     // Persist all completed IDs to storage
     const updatedCompletedIds = new Set(completedIds);

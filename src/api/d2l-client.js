@@ -256,4 +256,77 @@ export class D2LClient {
       return [];
     }
   }
+
+  /**
+   * Directly extracts submitted dropbox folder IDs from LEARN HTML.
+   * @param {number} orgUnitId
+   * @returns {Promise<Set<number>>}
+   */
+  async getSubmittedDropboxFolderIds(orgUnitId) {
+    try {
+      const response = await this.fetchFn(
+        `${BASE_URL}/d2l/lms/dropbox/user/folders_list.d2l?ou=${orgUnitId}`,
+        { method: 'GET', credentials: 'include' }
+      );
+      if (!response.ok) return new Set();
+      const html = await response.text();
+
+      const submitted = new Set();
+      const trMatches = html.match(/<tr[^>]*>[\s\S]*?<\/tr>/gi) || [];
+
+      for (const tr of trMatches) {
+        const plain = tr.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ');
+        const dbMatch = tr.match(/href="[^"]*db=(\d+)[^"]*"/i);
+        if (dbMatch) {
+          const folderId = Number(dbMatch[1]);
+          const isSubmitted =
+            /submission/i.test(plain) ||
+            /folders_history/i.test(tr) ||
+            (/%/i.test(plain) && !/not submitted/i.test(plain));
+          if (isSubmitted) {
+            submitted.add(folderId);
+          }
+        }
+      }
+      return submitted;
+    } catch (_) {
+      return new Set();
+    }
+  }
+
+  /**
+   * Directly extracts completed quiz IDs from LEARN HTML attempts count.
+   * @param {number} orgUnitId
+   * @returns {Promise<Set<number>>}
+   */
+  async getCompletedQuizIds(orgUnitId) {
+    try {
+      const response = await this.fetchFn(
+        `${BASE_URL}/d2l/lms/quizzing/user/quizzes_list.d2l?ou=${orgUnitId}`,
+        { method: 'GET', credentials: 'include' }
+      );
+      if (!response.ok) return new Set();
+      const html = await response.text();
+
+      const completed = new Set();
+      const trMatches = html.match(/<tr[^>]*>[\s\S]*?<\/tr>/gi) || [];
+
+      for (const tr of trMatches) {
+        if (/GoToQuiz/i.test(tr)) {
+          const qMatch = tr.match(/GoToQuiz\((\d+)/i);
+          if (qMatch) {
+            const quizId = Number(qMatch[1]);
+            const plain = tr.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ');
+            const attMatch = plain.match(/(\d+)\s*\/\s*(?:\d+|unlimited)/i);
+            if (attMatch && Number(attMatch[1]) > 0) {
+              completed.add(quizId);
+            }
+          }
+        }
+      }
+      return completed;
+    } catch (_) {
+      return new Set();
+    }
+  }
 }
