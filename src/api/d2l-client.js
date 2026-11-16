@@ -204,17 +204,137 @@ export class D2LClient {
   }
 
   /**
-   * Retrieves grade values for the current user in an org unit.
+   * Retrieves complete grade items from LEARN HTML (exact same layout and all items).
+   * Falls back to REST API myGradeValues if HTML fetch fails.
    * @param {number} orgUnitId
    * @returns {Promise<Array<object>>}
    */
   async getGrades(orgUnitId) {
-    if (!this.leVersion) {
-      await this.getVersions();
+    try {
+      const response = await this.fetchFn(
+        `${BASE_URL}/d2l/lms/grades/my_grades/main.d2l?ou=${orgUnitId}`,
+        { method: 'GET', credentials: 'include' }
+      );
+      if (response.ok) {
+        const html = await response.text();
+        const parsed = this.parseGradesHtml(html);
+        if (parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (_) {}
+
+    // Fallback to REST API
+    try {
+      if (!this.leVersion) {
+        await this.getVersions();
+      }
+      const url = Endpoints.grades(this.leVersion, orgUnitId);
+      const data = await this.requestJson(url);
+      return Array.isArray(data) ? data : [];
+    } catch (_) {
+      return [];
     }
-    const url = Endpoints.grades(this.leVersion, orgUnitId);
-    const data = await this.requestJson(url);
-    return Array.isArray(data) ? data : [];
+  }
+
+  /**
+   * Parses complete hierarchical grade items from LEARN HTML table.
+   * @param {string} html
+   * @returns {Array<object>}
+   */
+  parseGradesHtml(html) {
+    const items = [];
+    const trMatches = html.match(/<tr[^>]*>[\s\S]*?<\/tr>/gi) || [];
+    let currentCategoryId = null;
+    let currentCategoryName = null;
+
+    for (const tr of trMatches) {
+      if (/class="[^"]*d_gh[^"]*"/i.test(tr)) continue; // Skip header row
+
+      const thMatch = tr.match(/<th[^>]*>([\s\S]*?)<\/th>/i);
+      if (!thMatch) continue;
+
+      const cleanName = thMatch[1].replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim();
+      if (!cleanName || cleanName.toLowerCase() === 'grade item') continue;
+
+      const isCategory = /class="[^"]*d_ggl1[^"]*"/i.test(tr);
+
+      const tdMatches = tr.match(/<td[^>]*>([\s\S]*?)<\/td>/gi) || [];
+      const tds = tdMatches.map((td) => td.replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim());
+
+      let pointsStr = '';
+      let weightStr = '';
+      let gradeStr = '';
+      let commentsStr = '';
+
+      if (isCategory) {
+        weightStr = tds[1] || '';
+        gradeStr = tds[2] || '';
+        commentsStr = tds[3] || '';
+      } else {
+        if (tds.length >= 4 && tds[0] === '') {
+          pointsStr = tds[1] || '';
+          weightStr = tds[2] || '';
+          gradeStr = tds[3] || '';
+          commentsStr = tds[4] || '';
+        } else {
+          pointsStr = tds[0] || '';
+          weightStr = tds[1] || '';
+          gradeStr = tds[2] || '';
+          commentsStr = tds[3] || '';
+        }
+      }
+
+      const itemId = `grade-${items.length + 1}`;
+      if (isCategory) {
+        currentCategoryId = itemId;
+        currentCategoryName = cleanName;
+      }
+
+      const pMatch = pointsStr.match(/([\d.]+)\s*\/\s*([\d.]+)/);
+      const score = pMatch ? parseFloat(pMatch[1]) : null;
+      const maxScore = pMatch ? parseFloat(pMatch[2]) : null;
+
+      const wMatch = weightStr.match(/([\d.]+)\s*\/\s*([\d.]+)/);
+      const weightedScore = wMatch ? parseFloat(wMatch[1]) : (parseFloat(weightStr) || null);
+      const weightedMax = wMatch ? parseFloat(wMatch[2]) : null;
+
+      const gMatch = gradeStr.match(/([\d.]+)\s*%/);
+      const percentVal = gMatch ? parseFloat(gMatch[1]) : (score !== null && maxScore > 0 ? (score / maxScore) * 100 : null);
+
+      // "if that is 0, mark is as ungraded. There should never be some zero mark as the grade"
+      const isZero = (score === 0 || percentVal === 0 || (isCategory && weightedScore === 0));
+      const isGraded = !isZero && (score !== null || percentVal !== null || (isCategory && weightedScore > 0));
+
+      // Extract comment / assessment links (e.g. View Quiz Attempts)
+      const linkMatch = tr.match(/<a[^>]*href="([^"]+)"[^>]*>[\s\S]*?(?:view quiz attempts|feedback|view submission)[\s\S]*?<\/a>/i) ||
+                        tr.match(/<td[^>]*class="[^"]*d2l-table-cell-last[^"]*"[^>]*>[\s\S]*?<a[^>]*href="([^"]+)"/i);
+      let commentUrl = linkMatch ? linkMatch[1].replace(/&amp;/g, '&') : null;
+      if (commentUrl && !commentUrl.startsWith('http')) {
+        commentUrl = `${BASE_URL}${commentUrl}`;
+      }
+
+      items.push({
+        id: itemId,
+        name: cleanName,
+        isCategory,
+        categoryId: isCategory ? null : currentCategoryId,
+        categoryName: isCategory ? null : currentCategoryName,
+        score: isGraded ? score : null,
+        maxScore,
+        percent: isGraded && percentVal !== null ? Math.round(percentVal * 10) / 10 : null,
+        weightedScore: isGraded ? weightedScore : 0,
+        weightedMax,
+        rawPointsStr: pointsStr,
+        rawWeightStr: weightStr,
+        rawGradeStr: gradeStr,
+        isGraded,
+        comment: commentsStr || null,
+        commentUrl: commentUrl || null,
+      });
+    }
+
+    return items;
   }
 
   /**

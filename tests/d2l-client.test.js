@@ -131,3 +131,47 @@ test('D2LClient extracts submitted dropboxes and completed quizzes from LEARN HT
   assert.ok(completedQz.has(777));
   assert.ok(!completedQz.has(888));
 });
+
+test('D2LClient.parseGradesHtml parses hierarchical grades, treats 0 as ungraded, and extracts comment links', () => {
+  const client = new D2LClient();
+  const sampleLearnHtml = `
+    <table class="d2l-table">
+      <tbody>
+        <tr class="d_gh"><th scope="col">Grade Item</th><th scope="col">Points</th><th scope="col">Weight Achieved</th><th scope="col">Grade</th><th scope="col">Comments and Assessments</th></tr>
+        <tr class="d_ggl1"><th scope="row" colspan="2"><label>Quizzes</label></th><td>&nbsp;</td><td>17.76 / 60</td><td>29.6 %</td><td>&nbsp;</td></tr>
+        <tr><td class="d_g_treeNodeImage"><img src="pixel.gif"></td><th scope="row"><label>F26 Quiz 1</label></th><td>17.76 / 20</td><td>17.76 / 20</td><td>88.79 %</td><td><a href="/d2l/lms/quizzing/user/quiz_submissions.d2l?ou=1293264&qi=325468"><span>View Quiz Attempts</span></a></td></tr>
+        <tr><td class="d_g_treeNodeImage"><img src="pixel.gif"></td><th scope="row"><label>F26 Quiz 2</label></th><td>0 / 20</td><td>0 / 20</td><td>0 %</td><td><span>View Quiz Attempts</span></td></tr>
+        <tr><th scope="row" colspan="2"><label>Bonus (Bonus)</label></th><td>0 / 2</td><td>0</td><td></td><td></td></tr>
+      </tbody>
+    </table>
+  `;
+
+  const parsed = client.parseGradesHtml(sampleLearnHtml);
+  assert.strictEqual(parsed.length, 4);
+
+  // Category
+  const cat = parsed[0];
+  assert.strictEqual(cat.name, 'Quizzes');
+  assert.strictEqual(cat.isCategory, true);
+  assert.strictEqual(cat.weightedScore, 17.76);
+  assert.strictEqual(cat.weightedMax, 60);
+
+  // Scored Child
+  const q1 = parsed[1];
+  assert.strictEqual(q1.name, 'F26 Quiz 1');
+  assert.strictEqual(q1.isCategory, false);
+  assert.strictEqual(q1.categoryName, 'Quizzes');
+  assert.strictEqual(q1.score, 17.76);
+  assert.strictEqual(q1.maxScore, 20);
+  assert.strictEqual(q1.percent, 88.8);
+  assert.strictEqual(q1.isGraded, true);
+  assert.ok(q1.commentUrl && q1.commentUrl.includes('quiz_submissions.d2l'));
+
+  // Zero-score Child (must be marked ungraded!)
+  const q2 = parsed[2];
+  assert.strictEqual(q2.name, 'F26 Quiz 2');
+  assert.strictEqual(q2.isGraded, false);
+  assert.strictEqual(q2.score, null);
+  assert.strictEqual(q2.percent, null);
+  assert.strictEqual(q2.rawPointsStr, '0 / 20');
+});

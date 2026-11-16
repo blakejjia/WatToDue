@@ -121,6 +121,11 @@ export function normalizeGrades(rawGrades) {
   let currentCategoryName = null;
 
   return rawGrades.map((item) => {
+    // If already structured from LEARN HTML table parser
+    if (item.rawPointsStr !== undefined || item.rawWeightStr !== undefined) {
+      return item;
+    }
+
     const isCategory = item.GradeObjectType === 9 || item.GradeObjectTypeName === 'Category' || item.type === 9 || item.type === 'Category';
     const itemId = String(item.GradeObjectIdentifier || item.Id || Math.random());
     const itemName = item.GradeObjectName || item.name || 'Grade Item';
@@ -148,6 +153,10 @@ export function normalizeGrades(rawGrades) {
       comment = item.comment;
     }
 
+    // "if that is 0, mark is as ungraded. There should never be some zero mark as the grade, rather, if that is a 0, that is not marked"
+    const isZero = (score === 0 || percent === 0 || (isCategory && weightedScore === 0));
+    const isGraded = !isZero && (score !== null || percent !== null || (isCategory && weightedScore > 0));
+
     return {
       id: itemId,
       name: itemName,
@@ -155,13 +164,17 @@ export function normalizeGrades(rawGrades) {
       isCategory,
       categoryId: isCategory ? null : currentCategoryId,
       categoryName: isCategory ? null : currentCategoryName,
-      score,
+      score: isGraded ? score : null,
       maxScore,
-      percent,
-      weightedScore,
+      percent: isGraded ? percent : null,
+      weightedScore: isGraded ? weightedScore : 0,
       weightedMax,
       displayedGrade: item.DisplayedGrade || item.displayedGrade || null,
+      rawPointsStr: score !== null && maxScore !== null ? `${score} / ${maxScore}` : '',
+      rawWeightStr: weightedScore !== null && weightedMax !== null ? `${weightedScore} / ${weightedMax}` : '',
+      isGraded,
       comment,
+      commentUrl: item.commentUrl || null,
     };
   });
 }

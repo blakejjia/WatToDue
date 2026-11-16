@@ -1,5 +1,6 @@
 import { el, clear } from '../utils/dom.js';
 import { getCourseBadge } from './timeline-card.js';
+import { BASE_URL } from '../api/endpoints.js';
 
 /**
  * Returns letter grade string for University of Waterloo grading scale.
@@ -22,7 +23,7 @@ export function getLetterGrade(percent) {
 }
 
 /**
- * Cleanly formats a raw score/number without long ugly floating-point precision.
+ * Cleanly formats a raw score/number without long floating-point precision.
  * @param {number|string|null} val
  * @returns {string}
  */
@@ -56,7 +57,7 @@ function getGradeColorTokens(percent) {
 }
 
 /**
- * Groups a sequence of grade items into hierarchical categories and standalone items.
+ * Groups grade items into categories and standalone items matching LEARN layout.
  * @param {Array<object>} items
  * @returns {{ categories: Array<{ category: object, items: Array<object> }>, standalone: Array<object> }}
  */
@@ -72,7 +73,7 @@ export function groupGradesByCategory(items) {
         items: [],
       };
       categories.push(currentGroup);
-    } else if (currentGroup && item.categoryId === currentGroup.category.id) {
+    } else if (currentGroup && (item.categoryId === currentGroup.category.id || !item.categoryId)) {
       currentGroup.items.push(item);
     } else {
       standalone.push(item);
@@ -98,7 +99,7 @@ export class GradesView {
     this.searchQuery = '';
     this.activeFilter = 'all'; // 'all' | 'graded' | 'ungraded'
     this.viewLayout = 'table'; // 'table' | 'cards'
-    this.collapsedCategories = new Set(); // Category IDs that are collapsed
+    this.collapsedCategories = new Set();
 
     // Select first course with grades or first course
     const firstCourseWithGrades = this.courses.find(
@@ -169,58 +170,38 @@ export class GradesView {
     }
     root.appendChild(tabsStrip);
 
-    // 2. Selected Course Calculation (Strictly distinguishes Category totals vs Sub-items!)
+    // 2. Selected Course Calculation
+    // "here, if that is 0, mark is as ungraded. There should never be some zero mark as the grade"
     const selectedCourse = this.courses.find((c) => c.id === this.selectedCourseId) || this.courses[0];
     const gradeItems = this.gradesMap[selectedCourse.id] || [];
     const courseBadge = getCourseBadge(selectedCourse.displayName || selectedCourse.name);
 
-    const hasCategories = gradeItems.some((i) => i.isCategory);
-
-    let totalWeightedScore = 0;
-    let totalWeightedMax = 0;
-    let totalCourseWeight = 0;
-    let scoredItemsCount = 0;
-    let totalSubItemsCount = 0;
-
-    if (hasCategories) {
-      // ONLY accumulate Category rows for the overall course weighted score
-      for (const item of gradeItems) {
-        if (item.isCategory) {
-          if (typeof item.weightedMax === 'number' && item.weightedMax > 0) {
-            totalCourseWeight += item.weightedMax;
-            if (typeof item.weightedScore === 'number') {
-              totalWeightedScore += item.weightedScore;
-              totalWeightedMax += item.weightedMax;
-            }
-          }
-        } else {
-          totalSubItemsCount++;
-          if (typeof item.score === 'number' && item.score !== null) {
-            scoredItemsCount++;
-          }
-        }
-      }
-    } else {
-      // Standalone flat course items
-      for (const item of gradeItems) {
-        totalSubItemsCount++;
-        if (typeof item.weightedScore === 'number' && typeof item.weightedMax === 'number' && item.weightedMax > 0) {
-          totalWeightedScore += item.weightedScore;
-          totalWeightedMax += item.weightedMax;
-          totalCourseWeight += item.weightedMax;
-        }
-        if (typeof item.score === 'number' && item.score !== null) {
-          scoredItemsCount++;
-        }
-      }
-    }
+    // Identify actually marked sub-items (score > 0, percent > 0)
+    const subItems = gradeItems.filter((i) => !i.isCategory);
+    const gradedSubItems = subItems.filter((i) => i.isGraded && (i.score > 0 || i.percent > 0));
 
     let overallPercent = null;
     let scoreLabel = '';
 
-    if (totalWeightedMax > 0) {
-      overallPercent = Math.round((totalWeightedScore / totalWeightedMax) * 1000) / 10;
-      scoreLabel = `${formatScore(totalWeightedScore)} / ${formatScore(totalWeightedMax)} weighted pts (${formatScore(totalWeightedScore)}% of final mark earned)`;
+    if (gradedSubItems.length > 0) {
+      // Calculate current average based solely on completed/graded assessments
+      let earnedWeight = 0;
+      let totalWeightGraded = 0;
+
+      for (const item of gradedSubItems) {
+        if (typeof item.weightedScore === 'number' && typeof item.weightedMax === 'number' && item.weightedMax > 0 && item.weightedScore > 0) {
+          earnedWeight += item.weightedScore;
+          totalWeightGraded += item.weightedMax;
+        } else if (typeof item.score === 'number' && typeof item.maxScore === 'number' && item.maxScore > 0 && item.score > 0) {
+          earnedWeight += item.score;
+          totalWeightGraded += item.maxScore;
+        }
+      }
+
+      if (totalWeightGraded > 0) {
+        overallPercent = Math.round((earnedWeight / totalWeightGraded) * 1000) / 10;
+        scoreLabel = `${formatScore(earnedWeight)} / ${formatScore(totalWeightGraded)} pts on graded work (${gradedSubItems.length} of ${subItems.length} marked)`;
+      }
     }
 
     const letterGrade = getLetterGrade(overallPercent);
@@ -250,7 +231,7 @@ export class GradesView {
             el(
               'div',
               { className: 'hero-meta-chips' },
-              el('span', { className: 'hero-chip' }, `📝 ${scoredItemsCount} of ${totalSubItemsCount || gradeItems.length} graded`),
+              el('span', { className: 'hero-chip' }, `📝 ${gradedSubItems.length} of ${subItems.length} marked`),
               scoreLabel ? el('span', { className: 'hero-chip' }, `⚖ ${scoreLabel}`) : null
             )
           )
@@ -282,7 +263,7 @@ export class GradesView {
             { className: 'hero-score-sub' },
             overallPercent !== null
               ? (overallPercent >= 80 ? 'Excellent Standing' : (overallPercent >= 70 ? 'Good Standing' : 'Passing'))
-              : 'No graded entries yet'
+              : 'No marked entries yet'
           )
         )
       ),
@@ -327,7 +308,7 @@ export class GradesView {
               this.render();
             },
           },
-          `Graded (${scoredItemsCount})`
+          `Marked (${gradedSubItems.length})`
         ),
         el(
           'button',
@@ -338,7 +319,7 @@ export class GradesView {
               this.render();
             },
           },
-          `Ungraded (${gradeItems.length - scoredItemsCount})`
+          `Ungraded (${subItems.length - gradedSubItems.length})`
         )
       ),
       el(
@@ -361,7 +342,7 @@ export class GradesView {
             'button',
             {
               className: this.viewLayout === 'table' ? 'active' : '',
-              title: 'Table View',
+              title: 'Table View (matches Waterloo LEARN)',
               onClick: () => {
                 this.viewLayout = 'table';
                 this.render();
@@ -400,11 +381,11 @@ export class GradesView {
 
     let filtered = allItems;
 
-    // Apply status filter
+    // Apply status filter: if graded, only show items with a real grade
     if (this.activeFilter === 'graded') {
-      filtered = filtered.filter((i) => typeof i.score === 'number' || typeof i.percent === 'number' || (i.isCategory && typeof i.weightedScore === 'number'));
+      filtered = filtered.filter((i) => i.isGraded && (i.score > 0 || i.percent > 0 || (i.isCategory && i.weightedScore > 0)));
     } else if (this.activeFilter === 'ungraded') {
-      filtered = filtered.filter((i) => !i.isCategory && i.score === null && i.percent === null);
+      filtered = filtered.filter((i) => !i.isCategory && (!i.isGraded || i.score === null || i.score === 0));
     }
 
     // Apply search query
@@ -446,18 +427,18 @@ export class GradesView {
 
     const table = el('table', { className: 'grades-data-table' });
 
-    // Header matches LEARN: Grade Item | Points | Weight Achieved | Grade | Comments
+    // Table Header: exact match to Waterloo LEARN
     const thead = el(
       'thead',
       {},
       el(
         'tr',
         {},
-        el('th', { style: { minWidth: '260px', textAlign: 'left' } }, 'Grade Item'),
+        el('th', { style: { minWidth: '280px', textAlign: 'left' } }, 'Grade Item'),
         el('th', { style: { width: '130px', textAlign: 'right' } }, 'Points'),
         el('th', { style: { width: '150px', textAlign: 'right' } }, 'Weight Achieved'),
         el('th', { style: { width: '160px', textAlign: 'right' } }, 'Grade'),
-        el('th', { style: { width: '180px', textAlign: 'left' } }, 'Comments & Feedback')
+        el('th', { style: { width: '200px', textAlign: 'left' } }, 'Comments and Assessments')
       )
     );
     table.appendChild(thead);
@@ -465,15 +446,19 @@ export class GradesView {
     const tbody = el('tbody');
     const { categories, standalone } = groupGradesByCategory(items);
 
-    // 1. Render Categories with Indented Children
+    // 1. Render Categories with Indented Children (Matching Waterloo LEARN!)
     for (const group of categories) {
       const cat = group.category;
       const isCollapsed = this.collapsedCategories.has(cat.id);
-      const colorTokens = getGradeColorTokens(cat.percent);
 
-      const catWeightDisplay = typeof cat.weightedMax === 'number' && cat.weightedMax > 0
+      // Check if category has any marked items
+      const hasMarkedItems = group.items.some((i) => i.isGraded && (i.score > 0 || i.percent > 0));
+      const isCatGraded = cat.isGraded && hasMarkedItems;
+      const colorTokens = getGradeColorTokens(isCatGraded ? cat.percent : null);
+
+      const catWeightDisplay = cat.rawWeightStr || (typeof cat.weightedMax === 'number' && cat.weightedMax > 0
         ? `${formatScore(cat.weightedScore)} / ${formatScore(cat.weightedMax)}`
-        : '--';
+        : '--');
 
       // Category Header / 总分 Row
       const catRow = el(
@@ -489,7 +474,7 @@ export class GradesView {
             this.renderFilteredList(null, items);
           },
         },
-        // Col 1: Category Name with Expand Toggle
+        // Col 1: Grade Item
         el(
           'td',
           { className: 'col-name' },
@@ -512,13 +497,17 @@ export class GradesView {
         el(
           'td',
           { className: 'col-weight', style: { textAlign: 'right' } },
-          el('span', { className: 'category-weight-bold' }, catWeightDisplay)
+          el(
+            'span',
+            { className: isCatGraded ? 'category-weight-bold' : 'table-dash' },
+            catWeightDisplay
+          )
         ),
         // Col 4: Grade
         el(
           'td',
           { className: 'col-grade', style: { textAlign: 'right' } },
-          cat.percent !== null
+          isCatGraded && cat.percent !== null
             ? el(
                 'div',
                 { className: 'table-percent-box' },
@@ -539,7 +528,7 @@ export class GradesView {
                   })
                 )
               )
-            : el('span', { className: 'table-dash' }, '--')
+            : el('span', { className: 'table-dash' }, '—')
         ),
         // Col 5: Comments
         el('td', { className: 'col-comment' }, el('span', { className: 'table-dash' }, '—'))
@@ -549,12 +538,12 @@ export class GradesView {
       // Render Indented Child Items if Not Collapsed
       if (!isCollapsed) {
         for (const item of group.items) {
-          tbody.appendChild(this.createChildItemRow(item));
+          tbody.appendChild(this.createChildItemRow(item, true));
         }
       }
     }
 
-    // 2. Render Standalone Items (if course has items without a category)
+    // 2. Render Standalone Items
     if (standalone.length > 0) {
       if (categories.length > 0) {
         const standaloneHeader = el(
@@ -578,21 +567,50 @@ export class GradesView {
   }
 
   createChildItemRow(item, isIndented = true) {
-    const hasScore = typeof item.score === 'number' && typeof item.maxScore === 'number';
-    const percent = item.percent;
+    const isGraded = Boolean(item.isGraded && (item.score > 0 || item.percent > 0));
+    const percent = isGraded ? item.percent : null;
     const colorTokens = getGradeColorTokens(percent);
 
-    const pointsDisplay = hasScore
+    const pointsDisplay = isGraded && item.score !== null && item.maxScore !== null
       ? `${formatScore(item.score)} / ${formatScore(item.maxScore)}`
-      : (item.displayedGrade || '--');
+      : (item.rawPointsStr ? item.rawPointsStr : '--');
 
-    const weightDisplay = typeof item.weightedMax === 'number' && item.weightedMax > 0
+    const weightDisplay = isGraded && item.weightedScore !== null && item.weightedMax !== null
       ? `${formatScore(item.weightedScore)} / ${formatScore(item.weightedMax)}`
-      : '--';
+      : (item.rawWeightStr ? item.rawWeightStr : '--');
+
+    // Comments & Assessments
+    let commentEl = el('span', { className: 'table-dash' }, '—');
+    if (item.comment) {
+      if (/view quiz attempts/i.test(item.comment)) {
+        if (item.commentUrl) {
+          commentEl = el(
+            'a',
+            {
+              className: 'attempts-tag',
+              href: item.commentUrl,
+              target: '_blank',
+              rel: 'noopener noreferrer',
+              title: 'View Quiz Attempts on Waterloo LEARN',
+              style: { textDecoration: 'none' },
+            },
+            '👤 View Quiz Attempts ↗'
+          );
+        } else {
+          commentEl = el(
+            'span',
+            { className: 'attempts-tag', title: 'Quiz attempts on Waterloo LEARN' },
+            '👤 View Quiz Attempts'
+          );
+        }
+      } else {
+        commentEl = el('div', { className: 'table-feedback-text', title: item.comment }, item.comment);
+      }
+    }
 
     return el(
       'tr',
-      { className: `table-child-row ${isIndented ? 'is-indented' : ''} ${percent === null ? 'is-ungraded' : ''}` },
+      { className: `table-child-row ${isIndented ? 'is-indented' : ''} ${!isGraded ? 'is-ungraded' : ''}` },
       // Col 1: Name (indented)
       el(
         'td',
@@ -608,21 +626,23 @@ export class GradesView {
       el(
         'td',
         { className: 'col-points', style: { textAlign: 'right' } },
-        el('span', { className: hasScore ? 'table-score-bold' : 'table-dash' }, pointsDisplay)
+        isGraded
+          ? el('span', { className: 'table-score-bold' }, pointsDisplay)
+          : el('span', { className: 'table-dash' }, pointsDisplay)
       ),
       // Col 3: Weight Achieved
       el(
         'td',
         { className: 'col-weight', style: { textAlign: 'right' } },
-        weightDisplay !== '--'
+        isGraded
           ? el('span', { className: 'table-weight-pill' }, weightDisplay)
-          : el('span', { className: 'table-dash' }, '--')
+          : el('span', { className: 'table-dash' }, weightDisplay)
       ),
       // Col 4: Grade
       el(
         'td',
         { className: 'col-grade', style: { textAlign: 'right' } },
-        percent !== null
+        isGraded && percent !== null
           ? el(
               'div',
               { className: 'table-percent-box' },
@@ -643,16 +663,10 @@ export class GradesView {
                 })
               )
             )
-          : el('span', { className: 'table-dash' }, '--')
+          : el('span', { className: 'table-ungraded-text' }, '—')
       ),
-      // Col 5: Comments
-      el(
-        'td',
-        { className: 'col-comment' },
-        item.comment
-          ? el('div', { className: 'table-feedback-text', title: item.comment }, item.comment)
-          : el('span', { className: 'table-dash' }, '—')
-      )
+      // Col 5: Comments & Assessments
+      el('td', { className: 'col-comment' }, commentEl)
     );
   }
 
@@ -662,7 +676,8 @@ export class GradesView {
 
     for (const group of categories) {
       const cat = group.category;
-      const colorTokens = getGradeColorTokens(cat.percent);
+      const isGraded = Boolean(cat.isGraded && cat.percent > 0);
+      const colorTokens = getGradeColorTokens(isGraded ? cat.percent : null);
 
       const catCard = el(
         'div',
@@ -676,7 +691,7 @@ export class GradesView {
             el('span', {}, '📁'),
             el('div', { className: 'grade-card-title', style: { fontWeight: '800' } }, cat.name)
           ),
-          cat.percent !== null
+          isGraded && cat.percent !== null
             ? el(
                 'span',
                 {
@@ -690,13 +705,8 @@ export class GradesView {
         el(
           'div',
           { className: 'grade-card-meta-row' },
-          el('span', { className: 'table-weight-pill' }, `Total Weight: ${formatScore(cat.weightedMax)}%`),
-          el('span', { className: 'grade-card-score-text' }, `Achieved: ${formatScore(cat.weightedScore)} / ${formatScore(cat.weightedMax)}`)
-        ),
-        el(
-          'div',
-          { style: { fontSize: '11px', color: 'var(--text-muted)', marginTop: '4px' } },
-          `${group.items.length} sub-items in this category`
+          el('span', { className: 'table-weight-pill' }, `Weight: ${cat.rawWeightStr || formatScore(cat.weightedMax) + '%'}`),
+          el('span', { className: 'grade-card-score-text' }, isGraded ? `${formatScore(cat.weightedScore)} / ${formatScore(cat.weightedMax)}` : 'Ungraded')
         )
       );
       grid.appendChild(catCard);
@@ -714,26 +724,26 @@ export class GradesView {
   }
 
   createChildCard(item) {
-    const hasScore = typeof item.score === 'number' && typeof item.maxScore === 'number';
-    const percent = item.percent;
+    const isGraded = Boolean(item.isGraded && (item.score > 0 || item.percent > 0));
+    const percent = isGraded ? item.percent : null;
     const colorTokens = getGradeColorTokens(percent);
 
-    const pointsDisplay = hasScore
+    const pointsDisplay = isGraded && item.score !== null && item.maxScore !== null
       ? `${formatScore(item.score)} / ${formatScore(item.maxScore)}`
-      : (item.displayedGrade || '--');
+      : (item.rawPointsStr ? item.rawPointsStr : '--');
 
-    const weightDisplay = typeof item.weightedMax === 'number' && item.weightedMax > 0
+    const weightDisplay = isGraded && item.weightedScore !== null && item.weightedMax !== null
       ? `${formatScore(item.weightedScore)} / ${formatScore(item.weightedMax)}`
-      : null;
+      : (item.rawWeightStr ? item.rawWeightStr : null);
 
     return el(
       'div',
-      { className: `grade-card-item ${percent === null ? 'is-ungraded' : ''}` },
+      { className: `grade-card-item ${!isGraded ? 'is-ungraded' : ''}` },
       el(
         'div',
         { className: 'grade-card-top' },
         el('div', { className: 'grade-card-title', title: item.name }, item.name),
-        percent !== null
+        isGraded && percent !== null
           ? el(
               'span',
               {
@@ -742,7 +752,7 @@ export class GradesView {
               },
               `${percent}%`
             )
-          : el('span', { className: 'grade-card-dash' }, '--')
+          : el('span', { className: 'grade-card-dash' }, 'Ungraded')
       ),
       el(
         'div',
@@ -750,7 +760,7 @@ export class GradesView {
         weightDisplay ? el('span', { className: 'table-weight-pill' }, `Weight: ${weightDisplay}`) : null,
         el('span', { className: 'grade-card-score-text' }, pointsDisplay)
       ),
-      percent !== null
+      isGraded && percent !== null
         ? el(
             'div',
             { className: 'table-mini-bar-track', style: { width: '100%', marginTop: '8px' } },
