@@ -1,0 +1,15 @@
+# Reference repository
+agent2learn_ref/
+
+# Superpowers scratch
+.superpowers/
+
+# Dependencies
+node_modules/
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+*.log
+.vscode/
+.idea/
