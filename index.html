@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WatToDue Dashboard - Waterloo LEARN Dues & Grades</title>
+  <link rel="stylesheet" href="styles/variables.css">
+  <link rel="stylesheet" href="styles/layout.css">
+  <link rel="stylesheet" href="styles/components.css">
+  <link rel="stylesheet" href="styles/calendar.css">
+  <link rel="stylesheet" href="styles/grades.css">
+  <style>
+    /* Full-page wide layout enhancements */
+    body:not(.popup-mode) .nav-rail {
+      width: 76px;
+      min-width: 76px;
+      padding: 18px 0 20px 0;
+    }
+    body:not(.popup-mode) .rail-brand img {
+      width: 38px;
+      height: 38px;
+    }
+    body:not(.popup-mode) .rail-item {
+      width: 56px;
+      height: 54px;
+    }
+    body:not(.popup-mode) .view-header {
+      height: 60px;
+      padding: 0 28px;
+    }
+    body:not(.popup-mode) .view-title {
+      font-size: 18px;
+    }
+    body:not(.popup-mode) .view-body {
+      padding: 24px 28px;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+    body:not(.popup-mode) .agenda-list {
+      max-width: 900px;
+    }
+    body:not(.popup-mode) .calendar-matrix-container {
+      max-width: 950px;
+      padding: 20px;
+    }
+    body:not(.popup-mode) .calendar-cell {
+      min-height: 72px;
+      padding: 8px;
+    }
+    body:not(.popup-mode) .cell-day-num {
+      font-size: 13px;
+    }
+    body:not(.popup-mode) .cell-dot {
+      width: 8px;
+      height: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <nav class="nav-rail" id="nav-rail"></nav>
+    <main class="main-content">
+      <header class="view-header">
+        <div class="view-title-group">
+          <h1 class="view-title" id="view-title">Dues</h1>
+        </div>
+        <div class="view-actions" id="view-actions">
+          <button class="btn btn-secondary" id="sync-quick-btn" title="Refresh data">
+            <span>↻</span>
+            <span>Refresh</span>
+          </button>
+        </div>
+      </header>
+      <div id="banner-container"></div>
+      <div class="view-body" id="view-body"></div>
+    </main>
+  </div>
+  <script type="module" src="index.js"></script>
+</body>
+</html>
