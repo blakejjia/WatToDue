@@ -11,6 +11,8 @@ on:
   push:
     tags:
       - 'v*'
+      - '1.*'
+      - '[0-9]+*'
 
 permissions:
   contents: write
@@ -33,7 +35,7 @@ jobs:
         run: npm test
 
       - name: Package Extension ZIP
-        run: npm run pack
+        run: node scripts/pack.js
 
       - name: Upload Extension Artifact
         uses: actions/upload-artifact@v4
@@ -43,8 +45,19 @@ jobs:
           retention-days: 30
 
       - name: Create GitHub Release
-        if: startsWith(github.ref, 'refs/tags/v') || github.event.inputs.create_release == 'true'
+        if: startsWith(github.ref, 'refs/tags/') || github.event.inputs.create_release == 'true'
         uses: softprops/action-gh-release@v2
         with:
           files: dist/*.zip
           generate_release_notes: true
+
+      - name: Upload & Publish to Chrome Web Store
+        if: env.CHROME_CLIENT_ID != '' && startsWith(github.ref, 'refs/tags/')
+        uses: fregante/chrome-webstore-upload@v2
+        env:
+          CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
+        with:
+          extension-id: ${{ secrets.CHROME_EXTENSION_ID }}
+          client-id: ${{ secrets.CHROME_CLIENT_ID }}
+          client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
+          refresh-token: ${{ secrets.CHROME_REFRESH_TOKEN }}

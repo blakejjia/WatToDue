@@ -19,6 +19,7 @@ if (existsSync(zipPath)) {
 const files = [
   'manifest.json',
   'index.html',
+  'index.js',
   'popup.html',
   'popup.js',
   'src',

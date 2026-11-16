@@ -13,6 +13,9 @@
     "default_popup": "popup.html",
     "default_title": "WatToDue"
   },
+  "background": {
+    "service_worker": "src/background.js"
+  },
   "icons": {
     "16": "icons/icon-16.png",
     "48": "icons/icon-48.png",
