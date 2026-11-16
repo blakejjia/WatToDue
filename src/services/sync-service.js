@@ -2,6 +2,7 @@ import { D2LClient } from '../api/d2l-client.js';
 import { Endpoints } from '../api/endpoints.js';
 import { parseCourseOffering, groupCoursesByTerm } from './course-manager.js';
 import { storageManager } from './storage-manager.js';
+import { isDueCompletedByGrade } from './completion-matcher.js';
 
 /**
  * Normalizes assignments and quizzes into unified DueItem array.
@@ -9,9 +10,16 @@ import { storageManager } from './storage-manager.js';
  * @param {Record<number, Array<object>>} dropboxesMap
  * @param {Record<number, Array<object>>} quizzesMap
  * @param {Set<string>|Array<string>} completedIds
+ * @param {Record<number, Array<object>>} [gradesMap={}]
  * @returns {Array<object>}
  */
-export function normalizeDues(courses, dropboxesMap = {}, quizzesMap = {}, completedIds = new Set()) {
+export function normalizeDues(
+  courses,
+  dropboxesMap = {},
+  quizzesMap = {},
+  completedIds = new Set(),
+  gradesMap = {}
+) {
   const completedSet = completedIds instanceof Set ? completedIds : new Set(completedIds || []);
   const dues = [];
 
@@ -27,15 +35,20 @@ export function normalizeDues(courses, dropboxesMap = {}, quizzesMap = {}, compl
     const courseId = Number(courseIdStr);
     const course = courseLookup.get(courseId);
     if (!Array.isArray(items)) continue;
+    const courseGrades = gradesMap[courseId] || [];
 
     for (const item of items) {
       if (!item || !item.DueDate) continue; // Skip undated items
       const id = `dropbox-${item.Id}`;
+      const title = item.Name || 'Assignment';
+      const gradeCompleted = isDueCompletedByGrade({ title }, courseGrades);
+      const isCompleted = completedSet.has(id) || gradeCompleted;
+
       dues.push({
         id,
         rawId: item.Id,
         type: 'assignment',
-        title: item.Name || 'Assignment',
+        title,
         courseId,
         courseName: course?.displayName || course?.name || `Course ${courseId}`,
         courseCode: course?.code || '',
@@ -43,7 +56,8 @@ export function normalizeDues(courses, dropboxesMap = {}, quizzesMap = {}, compl
         dueDate: item.DueDate,
         customInstructions: item.CustomInstructions?.Text || null,
         url: Endpoints.dropboxSubmissionUrl(courseId, item.Id),
-        completed: completedSet.has(id),
+        completed: isCompleted,
+        autoCompleted: gradeCompleted,
       });
     }
   }
@@ -53,15 +67,20 @@ export function normalizeDues(courses, dropboxesMap = {}, quizzesMap = {}, compl
     const courseId = Number(courseIdStr);
     const course = courseLookup.get(courseId);
     if (!Array.isArray(items)) continue;
+    const courseGrades = gradesMap[courseId] || [];
 
     for (const item of items) {
       if (!item || !item.DueDate) continue; // Skip undated quizzes
       const id = `quiz-${item.QuizId}`;
+      const title = item.Name || 'Quiz';
+      const gradeCompleted = isDueCompletedByGrade({ title }, courseGrades);
+      const isCompleted = completedSet.has(id) || gradeCompleted;
+
       dues.push({
         id,
         rawId: item.QuizId,
         type: 'quiz',
-        title: item.Name || 'Quiz',
+        title,
         courseId,
         courseName: course?.displayName || course?.name || `Course ${courseId}`,
         courseCode: course?.code || '',
@@ -70,7 +89,8 @@ export function normalizeDues(courses, dropboxesMap = {}, quizzesMap = {}, compl
         startDate: item.StartDate || null,
         endDate: item.EndDate || null,
         url: Endpoints.quizSummaryUrl(courseId, item.QuizId),
-        completed: completedSet.has(id),
+        completed: isCompleted,
+        autoCompleted: gradeCompleted,
       });
     }
   }
@@ -208,9 +228,52 @@ export class SyncService {
     );
 
     const completedIds = await storageManager.get('completedDueIds', []);
-    const dues = normalizeDues(targetCourses, dropboxesMap, quizzesMap, completedIds);
+    const dues = normalizeDues(targetCourses, dropboxesMap, quizzesMap, completedIds, gradesMap);
+
+    // Opportunistically check past-due items to see if submissions or attempts exist
+    const nowTime = Date.now();
+    const uncompletedPastItems = dues.filter(
+      (d) => !d.completed && new Date(d.dueDate).getTime() < nowTime
+    );
+
+    if (uncompletedPastItems.length > 0) {
+      // Chunk check to avoid rate-limiting
+      await Promise.all(
+        uncompletedPastItems.slice(0, 15).map(async (due) => {
+          try {
+            if (due.type === 'assignment') {
+              const subs = await this.client.getDropboxSubmissions(due.courseId, due.rawId);
+              const hasSubmissions = subs.some(
+                (s) => Array.isArray(s.Submissions) && s.Submissions.length > 0
+              );
+              if (hasSubmissions) {
+                due.completed = true;
+                due.autoCompleted = true;
+              }
+            } else if (due.type === 'quiz') {
+              const attempts = await this.client.getQuizAttempts(due.courseId, due.rawId);
+              if (Array.isArray(attempts) && attempts.length > 0) {
+                due.completed = true;
+                due.autoCompleted = true;
+              }
+            }
+          } catch (_) {
+            // Ignore individual probe failures
+          }
+        })
+      );
+    }
+
+    // Persist all completed IDs to storage
+    const updatedCompletedIds = new Set(completedIds);
+    for (const d of dues) {
+      if (d.completed) {
+        updatedCompletedIds.add(d.id);
+      }
+    }
 
     const nowIso = new Date().toISOString();
+    await storageManager.set('completedDueIds', Array.from(updatedCompletedIds));
     await storageManager.set('dues', dues);
     await storageManager.set('grades', gradesMap);
     await storageManager.set('lastSync', nowIso);

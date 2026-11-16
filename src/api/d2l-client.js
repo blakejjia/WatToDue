@@ -216,4 +216,44 @@ export class D2LClient {
     const data = await this.requestJson(url);
     return Array.isArray(data) ? data : [];
   }
+
+  /**
+   * Retrieves submission records for a specific dropbox folder.
+   * @param {number} orgUnitId
+   * @param {number} folderId
+   * @returns {Promise<Array<object>>}
+   */
+  async getDropboxSubmissions(orgUnitId, folderId) {
+    if (!this.leVersion) {
+      await this.getVersions();
+    }
+    const url = Endpoints.dropboxSubmissions(this.leVersion, orgUnitId, folderId);
+    try {
+      const data = await this.requestJson(url);
+      return Array.isArray(data) ? data : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
+  /**
+   * Retrieves user attempts for a specific quiz.
+   * @param {number} orgUnitId
+   * @param {number} quizId
+   * @returns {Promise<Array<object>>}
+   */
+  async getQuizAttempts(orgUnitId, quizId) {
+    if (!this.leVersion) {
+      await this.getVersions();
+    }
+    const url = Endpoints.quizAttempts(this.leVersion, orgUnitId, quizId);
+    try {
+      const data = await this.requestJson(url);
+      if (Array.isArray(data)) return data;
+      if (data && Array.isArray(data.Objects)) return data.Objects;
+      return [];
+    } catch (_) {
+      return [];
+    }
+  }
 }

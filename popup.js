@@ -72,7 +72,7 @@ class AppController {
     const rawDues = (await storageManager.get('dues', [])) || [];
     this.dues = rawDues.map((d) => ({
       ...d,
-      completed: completedIds.has(d.id),
+      completed: completedIds.has(d.id) || Boolean(d.completed),
     }));
 
     this.grades = await storageManager.get('grades', {});

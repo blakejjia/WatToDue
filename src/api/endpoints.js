@@ -23,6 +23,12 @@ export const Endpoints = {
   quizzes: (leVersion, orgUnitId) =>
     `${BASE_URL}/d2l/api/le/${leVersion}/${orgUnitId}/quizzes/`,
 
+  dropboxSubmissions: (leVersion, orgUnitId, folderId) =>
+    `${BASE_URL}/d2l/api/le/${leVersion}/${orgUnitId}/dropbox/folders/${folderId}/submissions/mysubmissions/`,
+
+  quizAttempts: (leVersion, orgUnitId, quizId) =>
+    `${BASE_URL}/d2l/api/le/${leVersion}/${orgUnitId}/quizzes/${quizId}/attempts/`,
+
   grades: (leVersion, orgUnitId) =>
     `${BASE_URL}/d2l/api/le/${leVersion}/${orgUnitId}/grades/values/myGradeValues/`,
 

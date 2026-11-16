@@ -15,9 +15,10 @@ export class CalendarView {
     this.onRefresh = options.onRefresh || (() => {});
 
     this.viewMode = 'agenda'; // 'agenda' | 'month'
+    this.showCompleted = false; // Collapsible completed section
     const now = new Date();
-    this.currentYear = now.getUTCFullYear();
-    this.currentMonth = now.getUTCMonth(); // 0-indexed
+    this.currentYear = now.getFullYear();
+    this.currentMonth = now.getMonth(); // 0-indexed
     this.selectedDayDues = null;
     this.selectedDayStr = null;
 
@@ -34,12 +35,28 @@ export class CalendarView {
 
     const root = el('div', { className: 'dues-container' });
 
+    const activeCount = this.dues.filter((d) => !d.completed).length;
+    const completedCount = this.dues.filter((d) => d.completed).length;
+
     // Mode Toggle Bar (Agenda vs Month)
     const toggleBar = el(
       'div',
       { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center' } },
-      el('span', { style: { fontSize: '12px', fontWeight: '600', color: 'var(--text-secondary)' } },
-        `${this.dues.length} Deadlines Total`
+      el(
+        'div',
+        { style: { display: 'flex', flexDirection: 'column' } },
+        el(
+          'span',
+          { style: { fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)' } },
+          `${activeCount} Pending Due${activeCount === 1 ? '' : 's'}`
+        ),
+        completedCount > 0
+          ? el(
+              'span',
+              { style: { fontSize: '11px', color: 'var(--text-secondary)' } },
+              `${completedCount} completed items`
+            )
+          : null
       ),
       el(
         'div',
@@ -126,17 +143,62 @@ export class CalendarView {
       const items = sections[sec.key];
       if (items.length === 0) continue;
 
-      const secEl = el(
-        'div',
-        { className: 'agenda-section' },
-        el('div', { className: `agenda-section-title ${sec.className}` },
-          `${sec.label} (${items.length})`
-        )
-      );
+      const secEl = el('div', { className: 'agenda-section' });
 
-      for (const item of items) {
-        secEl.appendChild(this.createDueCard(item, now));
+      if (sec.key === 'completed') {
+        const headerEl = el(
+          'div',
+          {
+            className: 'agenda-section-title',
+            style: {
+              cursor: 'pointer',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              userSelect: 'none',
+              padding: '4px 0',
+            },
+            onClick: () => {
+              this.showCompleted = !this.showCompleted;
+              this.render();
+            },
+          },
+          el('span', {}, `${sec.label} (${items.length})`),
+          el(
+            'span',
+            {
+              style: {
+                fontSize: '11px',
+                fontWeight: '600',
+                color: 'var(--text-secondary)',
+                padding: '2px 8px',
+                borderRadius: '4px',
+                background: 'var(--bg-card-hover)',
+              },
+            },
+            this.showCompleted ? 'Hide ▲' : 'Show ▼'
+          )
+        );
+        secEl.appendChild(headerEl);
+
+        if (this.showCompleted) {
+          for (const item of items) {
+            secEl.appendChild(this.createDueCard(item, now));
+          }
+        }
+      } else {
+        secEl.appendChild(
+          el(
+            'div',
+            { className: `agenda-section-title ${sec.className}` },
+            `${sec.label} (${items.length})`
+          )
+        );
+        for (const item of items) {
+          secEl.appendChild(this.createDueCard(item, now));
+        }
       }
+
       listContainer.appendChild(secEl);
     }
 
