@@ -51,12 +51,14 @@ jobs:
           files: dist/*.zip
           generate_release_notes: true
 
+      # Step for Chrome Web Store API (when secrets are configured)
       - name: Upload & Publish to Chrome Web Store
         if: env.CHROME_CLIENT_ID != '' && startsWith(github.ref, 'refs/tags/')
-        uses: fregante/chrome-webstore-upload@v2
+        uses: fregante/chrome-webstore-upload@v6.0.1
         env:
           CHROME_CLIENT_ID: ${{ secrets.CHROME_CLIENT_ID }}
         with:
+          file: dist/*.zip
           extension-id: ${{ secrets.CHROME_EXTENSION_ID }}
           client-id: ${{ secrets.CHROME_CLIENT_ID }}
           client-secret: ${{ secrets.CHROME_CLIENT_SECRET }}
