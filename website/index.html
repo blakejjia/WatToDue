@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WatToDue — Waterloo LEARN Dues & Grades Browser Extension</title>
+  <meta name="description" content="Never miss a deadline on Waterloo LEARN. Consolidated assignments, quizzes, and grade feedback right in your Chrome browser.">
+  <link rel="icon" type="image/png" href="../icons/icon-48.png">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Navbar -->
+  <header class="navbar">
+    <div class="container" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+      <a href="#" class="nav-brand">
+        <img src="../icons/icon-48.png" alt="WatToDue logo">
+        <span>WatToDue</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#install" class="nav-link">Install Guide</a>
+        <a href="https://github.com/blakejjia/WatToDue" target="_blank" rel="noopener noreferrer" class="nav-link">GitHub</a>
+        <a href="#install" class="nav-btn">Get Started</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero-pill">
+        <span>✨ Waterloo LEARN D2L Assistant</span>
+      </div>
+      <h1 class="hero-title">
+        Never Miss a Deadline on <span>Waterloo LEARN</span>.
+      </h1>
+      <p class="hero-subtitle">
+        WatToDue aggregates all your course assignment dropboxes, quizzes, and grade feedback into a clean, unified calendar dashboard right inside Google Chrome.
+      </p>
+      <div class="hero-actions">
+        <a href="#install" class="btn-primary">
+          <span>⬇ Install Extension</span>
+        </a>
+        <a href="https://github.com/blakejjia/WatToDue" target="_blank" rel="noopener noreferrer" class="btn-secondary">
+          <span>View Source on GitHub ↗</span>
+        </a>
+      </div>
+
+      <!-- Live Mockup -->
+      <div class="mockup-container">
+        <div class="mockup-rail">
+          <div class="mockup-rail-item active">📅<br>Dues</div>
+          <div class="mockup-rail-item">📊<br>Grades</div>
+          <div class="mockup-rail-item">⚙️<br>Settings</div>
+        </div>
+        <div class="mockup-body">
+          <div class="mockup-header">
+            <div>
+              <span style="font-weight: 700; font-size: 14px;">Dues Agenda</span>
+              <span style="font-size: 11px; color: var(--text-muted); margin-left: 8px;">Spring 2026 Term</span>
+            </div>
+            <span class="tag-blue mockup-tag">Synced</span>
+          </div>
+          <div class="mockup-cards">
+            <div class="mockup-card">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" checked style="accent-color: var(--gold);">
+                <div>
+                  <div style="font-size: 11px; color: var(--text-muted);"><span class="tag-blue mockup-tag">Dropbox</span> CHEM 233</div>
+                  <div style="font-size: 13px; font-weight: 600; text-decoration: line-through; opacity: 0.7;">Assignment 1 - Stereochemistry</div>
+                </div>
+              </div>
+              <span style="font-size: 11px; color: #10B981;">Completed</span>
+            </div>
+            <div class="mockup-card">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" style="accent-color: var(--gold);">
+                <div>
+                  <div style="font-size: 11px; color: var(--text-muted);"><span class="tag-amber mockup-tag">Quiz</span> CS 136</div>
+                  <div style="font-size: 13px; font-weight: 600;">Weekly Quiz 3 - Pointers & Memory</div>
+                </div>
+              </div>
+              <span style="font-size: 11px; color: #F59E0B; font-weight: 600;">Due Today 11:59 PM</span>
+            </div>
+            <div class="mockup-card">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <input type="checkbox" style="accent-color: var(--gold);">
+                <div>
+                  <div style="font-size: 11px; color: var(--text-muted);"><span class="tag-blue mockup-tag">Dropbox</span> BIOL 241</div>
+                  <div style="font-size: 13px; font-weight: 600;">Lab Report 2 - Enzyme Kinetics</div>
+                </div>
+              </div>
+              <span style="font-size: 11px; color: #9CA3AF;">Due Friday 5:00 PM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-tag">Engineered for Warriors</div>
+        <h2 class="section-title">Everything you need for your courses</h2>
+      </div>
+      <div class="features-grid">
+        <div class="feature-box">
+          <div class="feature-icon">📅</div>
+          <h3 class="feature-name">Unified Dues Calendar</h3>
+          <p class="feature-desc">All assignment dropboxes and quizzes consolidated by deadline. Switch between monthly grid and agenda views.</p>
+        </div>
+        <div class="feature-box">
+          <div class="feature-icon">📊</div>
+          <h3 class="feature-name">Course Gradebook</h3>
+          <p class="feature-desc">See points earned, total weights, percentage calculations, and read instructor comments in one organized place.</p>
+        </div>
+        <div class="feature-box">
+          <div class="feature-icon">⚙️</div>
+          <h3 class="feature-name">Smart Course Filter</h3>
+          <p class="feature-desc">Intelligent Waterloo term code detection (`1265` -> Spring 2026). Toggle Lecture, Lab, and Tutorial slots individually.</p>
+        </div>
+        <div class="feature-box">
+          <div class="feature-icon">🔒</div>
+          <h3 class="feature-name">Zero-Password Privacy</h3>
+          <p class="feature-desc">100% client-side Manifest V3. No passwords stored, zero tracking or external servers. Runs natively in your browser.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Installation Steps -->
+  <section class="steps-section" id="install">
+    <div class="container">
+      <div class="section-head">
+        <div class="section-tag">Quick Setup</div>
+        <h2 class="section-title">Install in 60 Seconds</h2>
+      </div>
+      <div class="steps-list">
+        <div class="step-card">
+          <div class="step-number">01</div>
+          <h4 class="step-title">Clone or Download</h4>
+          <p class="step-desc">Clone the repository via git or download the ZIP from GitHub to your computer.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">02</div>
+          <h4 class="step-title">Open Chrome Extensions</h4>
+          <p class="step-desc">In Chrome, type <code>chrome://extensions</code> in your address bar and press Enter.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">03</div>
+          <h4 class="step-title">Enable Developer Mode</h4>
+          <p class="step-desc">Toggle the <strong>Developer mode</strong> switch in the top-right corner of the Extensions page.</p>
+        </div>
+        <div class="step-card">
+          <div class="step-number">04</div>
+          <h4 class="step-title">Load Unpacked</h4>
+          <p class="step-desc">Click <strong>Load unpacked</strong> and select the <code>WatToDue</code> folder. Pin it to your toolbar and open LEARN!</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>Made with 💛 for University of Waterloo students · Open source on <a href="https://github.com/blakejjia/WatToDue" target="_blank" rel="noopener noreferrer">GitHub</a></p>
+    </div>
+  </footer>
+</body>
+</html>
