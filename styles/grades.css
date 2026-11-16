@@ -1,0 +1,177 @@
+/* Grades View Container */
+.grades-container {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Course Tabs Strip */
+.course-tabs-strip {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  user-select: none;
+}
+
+.course-tabs-strip::-webkit-scrollbar {
+  height: 4px;
+}
+
+.course-tabs-strip::-webkit-scrollbar-thumb {
+  background-color: var(--border-color);
+  border-radius: 2px;
+}
+
+.course-tab-pill {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: var(--border-radius-full);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+}
+
+.course-tab-pill:hover {
+  background-color: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.course-tab-pill.active {
+  background-color: var(--uw-gold);
+  border-color: var(--uw-gold-dark);
+  color: var(--uw-black);
+  box-shadow: 0 1px 4px rgba(253, 213, 79, 0.4);
+}
+
+/* Course Grade Summary Card */
+.course-summary-card {
+  background: linear-gradient(135deg, var(--bg-surface) 0%, var(--bg-surface-elevated) 100%);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg);
+  padding: 14px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: var(--shadow-sm);
+}
+
+.course-summary-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.course-summary-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.course-summary-code {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.course-summary-stats {
+  text-align: right;
+}
+
+.course-summary-score {
+  font-size: 20px;
+  font-weight: 800;
+  color: var(--uw-gold-dark);
+  line-height: 1.1;
+}
+
+.course-summary-items-count {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+/* Grade Items List */
+.grade-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.grade-item-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-md);
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  box-shadow: var(--shadow-sm);
+  transition: border-color 0.15s;
+}
+
+.grade-item-card:hover {
+  border-color: var(--border-color);
+  box-shadow: var(--shadow-md);
+}
+
+.grade-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.grade-item-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: 1;
+}
+
+.grade-score-group {
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.grade-score-primary {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.grade-score-percent {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--color-success);
+}
+
+.grade-item-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.grade-weight-badge {
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-color);
+  padding: 1px 6px;
+  border-radius: var(--border-radius-sm);
+  font-size: 10px;
+}
+
+/* Teacher Feedback Comment */
+.grade-comment-box {
+  background-color: var(--bg-app);
+  border-left: 3px solid var(--uw-gold-dark);
+  padding: 6px 10px;
+  border-radius: 0 var(--border-radius-sm) var(--border-radius-sm) 0;
+  font-size: 11px;
+  color: var(--text-secondary);
+  font-style: italic;
+  margin-top: 4px;
+}
