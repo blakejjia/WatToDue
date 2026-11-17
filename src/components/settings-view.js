@@ -95,7 +95,7 @@ export class SettingsView {
       el(
         'div',
         { style: { textAlign: 'center', fontSize: '12px', color: 'var(--text-muted)', margin: '14px 0 24px 0' } },
-        'WatToDue v1.0.0 · Free, Secure & 100% Client-Side for Waterloo Warriors'
+        'WatToDue v1.0.1 · Free, Secure & 100% Client-Side for Waterloo Warriors'
       )
     );
 

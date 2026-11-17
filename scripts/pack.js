@@ -31,7 +31,7 @@ console.log(`Packaging WatToDue v${version}...`);
 
 if (process.platform === 'win32') {
   const fileList = files.join(', ');
-  execSync(`powershell -NoProfile -Command "Compress-Archive -Path ${fileList} -DestinationPath '${zipPath}' -Force"`, {
+  execSync(`powershell -NoProfile -Command "$ProgressPreference = 'SilentlyContinue'; Compress-Archive -Path ${fileList} -DestinationPath '${zipPath}' -Force"`, {
     stdio: 'inherit',
   });
 } else {

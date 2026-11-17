@@ -51,7 +51,7 @@
 2. Click **Add to Chrome** *(Note: If Chrome shows a standard "Proceed with caution" prompt for newly registered developer accounts, simply click **Continue to install**)*.
 3. Pin WatToDue to your browser toolbar and visit [Waterloo LEARN](https://learn.uwaterloo.ca)!
 
-> **Manual Developer Install**: You can also download the standalone [`WatToDue-v1.0.0.zip`](https://github.com/blakejjia/WatToDue/releases/latest) and load unpacked in `chrome://extensions`.
+> **Manual Developer Install**: You can also download the standalone [`WatToDue-v1.0.1.zip`](https://github.com/blakejjia/WatToDue/releases/latest) and load unpacked in `chrome://extensions`.
 
 ---
 

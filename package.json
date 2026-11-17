@@ -1,6 +1,6 @@
 {
   "name": "wattodue",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Chrome extension for Waterloo LEARN dues, calendar, and grades.",
   "type": "module",
   "scripts": {
