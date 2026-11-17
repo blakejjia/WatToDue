@@ -7,7 +7,8 @@
   ### Never miss a Waterloo deadline again.
 
   [![Add to Chrome](https://img.shields.io/badge/Chrome_Web_Store-Add_to_Chrome-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/wattodue-waterloo-learn-d/bpigocbcnijjmncfgdloeillfmifcemn)
-  [![Live Showcase](https://img.shields.io/badge/Interactive_Demo-GitHub_Pages-f59e0b?style=for-the-badge&logo=github)](https://blakejjia.github.io/WatToDue/)
+  [![View on Google Play](https://img.shields.io/badge/Google_Play-View_on_Google_Play-00875A?style=for-the-badge&logo=googleplay&logoColor=white)](https://jia-yx.com/projects/wattodue/)
+  [![Live Showcase](https://img.shields.io/badge/Live_Showcase-jia--yx.com-f59e0b?style=for-the-badge&logo=safari&logoColor=white)](https://jia-yx.com/projects/wattodue/)
   [![Manifest V3](https://img.shields.io/badge/Chrome_MV3-Official_Store-10b981?style=for-the-badge)](https://chromewebstore.google.com/detail/wattodue-waterloo-learn-d/bpigocbcnijjmncfgdloeillfmifcemn)
   [![Tests](https://img.shields.io/badge/Tests-32_Passing-success?style=for-the-badge)](tests/)
 
@@ -15,7 +16,7 @@
     <b>Consolidates assignment dropboxes, quizzes, and grade trees across all your Waterloo LEARN courses into one clean, high-performance dashboard.</b>
   </p>
 
-  [**⚡ Install from Chrome Web Store**](https://chromewebstore.google.com/detail/wattodue-waterloo-learn-d/bpigocbcnijjmncfgdloeillfmifcemn) • [**🌐 Try Live Interactive Demo**](https://blakejjia.github.io/WatToDue/) • [**📦 Download ZIP**](https://github.com/blakejjia/WatToDue/releases/latest)
+  [**⚡ Install from Chrome Web Store**](https://chromewebstore.google.com/detail/wattodue-waterloo-learn-d/bpigocbcnijjmncfgdloeillfmifcemn) • [**📱 View on Google Play Store**](https://jia-yx.com/projects/wattodue/) • [**🌐 Live Web Showcase**](https://jia-yx.com/projects/wattodue/) • [**📦 Download ZIP**](https://github.com/blakejjia/WatToDue/releases/latest)
 
 </div>
 
@@ -45,11 +46,12 @@
 
 ---
 
-### 🚀 1-Click Install
+### 🚀 1-Click Install & Live Demo
 
-1. Open the [**WatToDue page on Chrome Web Store**](https://chromewebstore.google.com/detail/wattodue-waterloo-learn-d/bpigocbcnijjmncfgdloeillfmifcemn).
-2. Click **Add to Chrome** *(Note: If Chrome shows a standard "Proceed with caution" prompt for newly registered developer accounts, simply click **Continue to install**)*.
-3. Pin WatToDue to your browser toolbar and visit [Waterloo LEARN](https://learn.uwaterloo.ca)!
+1. **Chrome Web Store**: Open the [**WatToDue page on Chrome Web Store**](https://chromewebstore.google.com/detail/wattodue-waterloo-learn-d/bpigocbcnijjmncfgdloeillfmifcemn) and click **Add to Chrome**. *(Note: If Chrome shows a standard "Proceed with caution" prompt for new developer accounts, simply click **Continue to install**)*.
+2. **Google Play Store**: [**View on Google Play Store**](https://jia-yx.com/projects/wattodue/) for mobile availability and updates.
+3. **Live Showcase**: Visit our self-hosted demo at [**jia-yx.com/projects/wattodue/**](https://jia-yx.com/projects/wattodue/).
+4. Pin WatToDue to your browser toolbar and visit [Waterloo LEARN](https://learn.uwaterloo.ca)!
 
 > **Manual Developer Install**: You can also download the standalone [`WatToDue-v1.0.1.zip`](https://github.com/blakejjia/WatToDue/releases/latest) and load unpacked in `chrome://extensions`.
 
