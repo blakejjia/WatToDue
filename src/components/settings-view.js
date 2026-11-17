@@ -1,5 +1,6 @@
 import { el, clear } from '../utils/dom.js';
 import { storageManager } from '../services/storage-manager.js';
+import { createIcon } from '../utils/icons.js';
 
 export class SettingsView {
   /**
@@ -65,7 +66,8 @@ export class SettingsView {
         el(
           'div',
           { className: 'banner banner-warning', style: { marginBottom: '6px' } },
-          el('span', {}, `✨ ${this.toastMessage}`)
+          createIcon('sparkles', { size: 14, style: { marginRight: '6px' } }),
+          el('span', {}, this.toastMessage)
         )
       );
     }
@@ -141,8 +143,10 @@ export class SettingsView {
             href: 'https://learn.uwaterloo.ca',
             target: '_blank',
             rel: 'noopener noreferrer',
+            style: { display: 'inline-flex', alignItems: 'center', gap: '6px' },
           },
-          'Open LEARN ↗'
+          el('span', {}, 'Open LEARN'),
+          createIcon('external-link', { size: 12 })
         )
       )
     );
@@ -158,7 +162,7 @@ export class SettingsView {
         el(
           'div',
           { style: { display: 'flex', alignItems: 'center', gap: '8px' } },
-          el('span', { style: { fontSize: '18px' } }, '🛡️'),
+          createIcon('shield-check', { size: 18, style: { color: 'var(--uw-gold-dark)' } }),
           el(
             'span',
             { style: { fontSize: '14px', fontWeight: '800', color: 'var(--text-primary)' } },
@@ -168,7 +172,8 @@ export class SettingsView {
         el(
           'div',
           { className: 'privacy-badge-pill' },
-          '✓ Zero Data Collection'
+          createIcon('check', { size: 12, strokeWidth: 2.5 }),
+          el('span', {}, 'Zero Data Collection')
         )
       ),
       el(
@@ -182,7 +187,7 @@ export class SettingsView {
         el(
           'div',
           { className: 'privacy-point' },
-          el('span', { className: 'privacy-point-icon' }, '☁️'),
+          el('div', { className: 'privacy-point-icon' }, createIcon('cloud-off', { size: 16 })),
           el(
             'div',
             {},
@@ -197,7 +202,7 @@ export class SettingsView {
         el(
           'div',
           { className: 'privacy-point' },
-          el('span', { className: 'privacy-point-icon' }, '🔒'),
+          el('div', { className: 'privacy-point-icon' }, createIcon('lock', { size: 16 })),
           el(
             'div',
             {},
@@ -212,7 +217,7 @@ export class SettingsView {
         el(
           'div',
           { className: 'privacy-point' },
-          el('span', { className: 'privacy-point-icon' }, '👁️'),
+          el('div', { className: 'privacy-point-icon' }, createIcon('eye-off', { size: 16 })),
           el(
             'div',
             {},
@@ -227,7 +232,7 @@ export class SettingsView {
         el(
           'div',
           { className: 'privacy-point' },
-          el('span', { className: 'privacy-point-icon' }, '⚖️'),
+          el('div', { className: 'privacy-point-icon' }, createIcon('scale', { size: 16 })),
           el(
             'div',
             {},
@@ -250,9 +255,11 @@ export class SettingsView {
             href: 'https://github.com/blakejjia/WatToDue',
             target: '_blank',
             rel: 'noopener noreferrer',
-            style: { gap: '6px' },
+            title: 'WatToDue on GitHub (Source Code & Audit)',
+            style: { display: 'inline-flex', alignItems: 'center', gap: '6px' },
           },
-          '⭐ GitHub Repository & Source Code ↗'
+          createIcon('github', { size: 15 }),
+          el('span', {}, 'GitHub')
         ),
         el(
           'a',
@@ -261,9 +268,11 @@ export class SettingsView {
             href: 'https://chromewebstore.google.com/detail/wattodue-waterloo-learn-d/bpigocbcnijjmncfgdloeillfmifcemn',
             target: '_blank',
             rel: 'noopener noreferrer',
-            style: { gap: '6px' },
+            title: 'WatToDue on Chrome Web Store',
+            style: { display: 'inline-flex', alignItems: 'center', gap: '6px' },
           },
-          '🛍️ Chrome Web Store ↗'
+          createIcon('chrome', { size: 15 }),
+          el('span', {}, 'Chrome Web Store')
         )
       )
     );
@@ -360,7 +369,13 @@ export class SettingsView {
             await this.onSyncTriggered();
           },
         },
-        el('span', { className: 'course-chip-icon' }, isEnabled ? '✓' : '○'),
+        el(
+          'span',
+          { className: 'course-chip-icon', style: { display: 'inline-flex', alignItems: 'center' } },
+          isEnabled
+            ? createIcon('check', { size: 12, strokeWidth: 2.5 })
+            : createIcon('circle', { size: 12, strokeWidth: 1.5 })
+        ),
         el('span', {}, course.displayName || course.name)
       );
 
@@ -423,9 +438,9 @@ export class SettingsView {
     });
 
     const options = [
-      { value: 'auto', label: '🖥️ System Default' },
-      { value: 'light', label: '☀️ Light Mode' },
-      { value: 'dark', label: '🌙 Dark Mode' },
+      { value: 'auto', label: 'System Default' },
+      { value: 'light', label: 'Light Mode' },
+      { value: 'dark', label: 'Dark Mode' },
     ];
 
     for (const opt of options) {
@@ -492,6 +507,7 @@ export class SettingsView {
         {
           className: 'btn btn-primary',
           disabled: this.isSyncing,
+          style: { display: 'inline-flex', alignItems: 'center', gap: '6px' },
           onClick: async () => {
             this.isSyncing = true;
             this.render();
@@ -503,8 +519,10 @@ export class SettingsView {
             }
           },
         },
-        this.isSyncing ? el('span', { className: 'spinner' }) : '↻',
-        this.isSyncing ? 'Syncing...' : 'Sync Now'
+        this.isSyncing
+          ? el('span', { className: 'spinner' })
+          : createIcon('refresh-cw', { size: 13, strokeWidth: 2 }),
+        el('span', {}, this.isSyncing ? 'Syncing...' : 'Sync Now')
       )
     );
   }
@@ -542,12 +560,14 @@ export class SettingsView {
           'button',
           {
             className: 'btn btn-danger',
+            style: { display: 'inline-flex', alignItems: 'center', gap: '6px' },
             onClick: () => {
               this.showDeleteModal = true;
               this.render();
             },
           },
-          '🗑️ Delete User Data'
+          createIcon('trash-2', { size: 14 }),
+          el('span', {}, 'Delete User Data')
         )
       )
     );
@@ -570,7 +590,7 @@ export class SettingsView {
       el(
         'div',
         { className: 'modal-header' },
-        el('div', { className: 'modal-header-icon' }, '⚠️'),
+        el('div', { className: 'modal-header-icon' }, createIcon('triangle-alert', { size: 20 })),
         el('div', { className: 'modal-title' }, 'Delete Local User Data?')
       ),
       el(
@@ -596,6 +616,7 @@ export class SettingsView {
           'button',
           {
             className: 'btn btn-danger',
+            style: { display: 'inline-flex', alignItems: 'center', gap: '6px' },
             onClick: async () => {
               this.showDeleteModal = false;
               await storageManager.clearAll();
@@ -604,7 +625,8 @@ export class SettingsView {
               await this.onSyncTriggered();
             },
           },
-          'Yes, Delete Everything'
+          createIcon('trash-2', { size: 13 }),
+          el('span', {}, 'Yes, Delete Everything')
         )
       )
     );
