@@ -6,16 +6,16 @@
 
   ### Never miss a Waterloo deadline again.
 
+  [![Add to Chrome](https://img.shields.io/badge/Chrome_Web_Store-Add_to_Chrome-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://chromewebstore.google.com/detail/wattodue-waterloo-learn-d/bpigocbcnijjmncfgdloeillfmifcemn)
   [![Live Showcase](https://img.shields.io/badge/Interactive_Demo-GitHub_Pages-f59e0b?style=for-the-badge&logo=github)](https://blakejjia.github.io/WatToDue/)
-  [![Download ZIP](https://img.shields.io/badge/Download_Extension-v1.0.0-blue?style=for-the-badge&logo=googlechrome)](https://github.com/blakejjia/WatToDue/releases/latest)
-  [![Manifest V3](https://img.shields.io/badge/Chrome_MV3-Compliant-10b981?style=for-the-badge)](manifest.json)
+  [![Manifest V3](https://img.shields.io/badge/Chrome_MV3-Official_Store-10b981?style=for-the-badge)](https://chromewebstore.google.com/detail/wattodue-waterloo-learn-d/bpigocbcnijjmncfgdloeillfmifcemn)
   [![Tests](https://img.shields.io/badge/Tests-32_Passing-success?style=for-the-badge)](tests/)
 
   <p align="center">
     <b>Consolidates assignment dropboxes, quizzes, and grade trees across all your Waterloo LEARN courses into one clean, high-performance dashboard.</b>
   </p>
 
-  [**🌐 Try Live Interactive Demo**](https://blakejjia.github.io/WatToDue/) • [**📦 Download ZIP**](https://github.com/blakejjia/WatToDue/releases/latest) • [**⚡ Quick Setup**](#-quick-setup-30s)
+  [**⚡ Install from Chrome Web Store**](https://chromewebstore.google.com/detail/wattodue-waterloo-learn-d/bpigocbcnijjmncfgdloeillfmifcemn) • [**🌐 Try Live Interactive Demo**](https://blakejjia.github.io/WatToDue/) • [**📦 Download ZIP**](https://github.com/blakejjia/WatToDue/releases/latest)
 
 </div>
 
@@ -45,12 +45,13 @@
 
 ---
 
-### 🚀 Quick Setup (30s)
+### 🚀 1-Click Install
 
-1. **Download**: Grab [`WatToDue-v1.0.0.zip`](https://github.com/blakejjia/WatToDue/releases/latest) and extract it.
-2. **Open Extensions**: Go to `chrome://extensions` in Google Chrome and enable **Developer mode** (top right).
-3. **Load**: Click **Load unpacked** and select the extracted folder.
-4. **Done**: Pin WatToDue to your toolbar and open [Waterloo LEARN](https://learn.uwaterloo.ca)!
+1. Open the [**WatToDue page on Chrome Web Store**](https://chromewebstore.google.com/detail/wattodue-waterloo-learn-d/bpigocbcnijjmncfgdloeillfmifcemn).
+2. Click **Add to Chrome** *(Note: If Chrome shows a standard "Proceed with caution" prompt for newly registered developer accounts, simply click **Continue to install**)*.
+3. Pin WatToDue to your browser toolbar and visit [Waterloo LEARN](https://learn.uwaterloo.ca)!
+
+> **Manual Developer Install**: You can also download the standalone [`WatToDue-v1.0.0.zip`](https://github.com/blakejjia/WatToDue/releases/latest) and load unpacked in `chrome://extensions`.
 
 ---
 
