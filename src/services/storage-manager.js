@@ -129,6 +129,32 @@ class StorageManager {
   }
 
   /**
+   * Clears all local user data and caches.
+   * @returns {Promise<void>}
+   */
+  async clearAll() {
+    if (this.isExtension()) {
+      return new Promise((resolve) => {
+        chrome.storage.local.clear(resolve);
+      });
+    }
+
+    if (typeof localStorage !== 'undefined') {
+      const keysToRemove = [];
+      for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if (k && k.startsWith('wattodue_')) {
+          keysToRemove.push(k);
+        }
+      }
+      for (const k of keysToRemove) {
+        localStorage.removeItem(k);
+      }
+    }
+    this.memoryFallback.clear();
+  }
+
+  /**
    * Returns current user settings.
    * @returns {Promise<{ activeTerm: string|null, cacheTtlMinutes: number }>}
    */

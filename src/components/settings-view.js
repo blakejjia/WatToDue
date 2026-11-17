@@ -25,6 +25,8 @@ export class SettingsView {
 
     this.isSyncing = false;
     this.enabledCourseIds = null;
+    this.showDeleteModal = false;
+    this.toastMessage = null;
 
     this.loadStateAndRender();
   }
@@ -43,199 +45,372 @@ export class SettingsView {
     this.loadStateAndRender();
   }
 
+  showToast(message) {
+    this.toastMessage = message;
+    this.render();
+    setTimeout(() => {
+      this.toastMessage = null;
+      this.render();
+    }, 3500);
+  }
+
   render() {
     clear(this.container);
 
-    const root = el('div', { style: { display: 'flex', flexDirection: 'column', gap: '16px' } });
+    const root = el('div', { className: 'settings-container' });
 
-    // 1. User & Authentication Status
-    const sessionCard = el(
-      'div',
-      {
-        style: {
-          backgroundColor: 'var(--bg-surface)',
-          border: '1px solid var(--border-color)',
-          borderRadius: 'var(--border-radius-md)',
-          padding: '14px',
-          boxShadow: 'var(--shadow-sm)',
-        },
-      },
-      el('div', { style: { fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' } },
-        'Account & Connection'
-      ),
-      el(
-        'div',
-        { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '6px' } },
+    // Toast alert banner if active
+    if (this.toastMessage) {
+      root.appendChild(
         el(
           'div',
-          {},
-          el('div', { style: { fontSize: '14px', fontWeight: '700', color: 'var(--text-primary)' } },
-            this.user ? `${this.user.firstName} ${this.user.lastName}` : 'Not Connected'
-          ),
-          el('div', { style: { fontSize: '11px', color: 'var(--text-secondary)' } },
-            this.user ? `ID: ${this.user.identifier || this.user.uniqueName} · Waterloo LEARN` : 'Session cookie not detected'
+          { className: 'banner banner-warning', style: { marginBottom: '6px' } },
+          el('span', {}, `✨ ${this.toastMessage}`)
+        )
+      );
+    }
+
+    // 1. User Account & Connection Profile Card (Top-level, Clean Name Only)
+    root.appendChild(this.renderAccountCard());
+
+    // 2. Privacy & Security Guarantee Card (Zero Server, 100% Client-Side, Open Source)
+    root.appendChild(this.renderPrivacyCard());
+
+    // 3. Course Selection (Material Design Filter Chip Badges)
+    root.appendChild(this.renderCourseChipsCard());
+
+    // 4. Term & Appearance Preferences
+    root.appendChild(this.renderPreferencesCard());
+
+    // 5. Data Sync Card
+    root.appendChild(this.renderSyncCard());
+
+    // 6. Danger Zone (Delete Local User Data)
+    root.appendChild(this.renderDangerZoneCard());
+
+    // 7. Footer
+    root.appendChild(
+      el(
+        'div',
+        { style: { textAlign: 'center', fontSize: '12px', color: 'var(--text-muted)', margin: '14px 0 24px 0' } },
+        'WatToDue v1.0.0 · Free, Secure & 100% Client-Side for Waterloo Warriors'
+      )
+    );
+
+    // 8. Delete Confirmation Modal (if active)
+    if (this.showDeleteModal) {
+      root.appendChild(this.renderDeleteConfirmationModal());
+    }
+
+    this.container.appendChild(root);
+  }
+
+  renderAccountCard() {
+    const fullName = this.user
+      ? `${this.user.firstName || ''} ${this.user.lastName || ''}`.trim() || 'Waterloo Warrior'
+      : 'Waterloo Student';
+
+    const initial = this.user?.firstName ? this.user.firstName[0].toUpperCase() : 'W';
+
+    return el(
+      'div',
+      { className: 'settings-card' },
+      el(
+        'div',
+        { className: 'settings-profile-header' },
+        el(
+          'div',
+          { className: 'settings-avatar-group' },
+          el('div', { className: 'settings-avatar' }, initial),
+          el(
+            'div',
+            { className: 'settings-profile-info' },
+            el('div', { className: 'settings-profile-name' }, fullName),
+            el(
+              'div',
+              { className: 'settings-profile-status' },
+              el('span', { className: 'status-dot-active' }),
+              'Connected to Waterloo LEARN'
+            )
           )
         ),
         el(
           'a',
           {
-            className: 'btn btn-secondary btn-sm',
+            className: 'btn btn-secondary',
             href: 'https://learn.uwaterloo.ca',
             target: '_blank',
             rel: 'noopener noreferrer',
           },
-          this.user ? 'Open LEARN ↗' : 'Log in to LEARN'
+          'Open LEARN ↗'
         )
       )
     );
-    root.appendChild(sessionCard);
+  }
 
-    // 2. Academic Term Selection
-    const termCard = el(
+  renderPrivacyCard() {
+    return el(
       'div',
-      {
-        style: {
-          backgroundColor: 'var(--bg-surface)',
-          border: '1px solid var(--border-color)',
-          borderRadius: 'var(--border-radius-md)',
-          padding: '14px',
-          boxShadow: 'var(--shadow-sm)',
-        },
-      },
-      el('div', { style: { fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' } },
-        'Active Academic Term'
-      ),
-      el('div', { style: { display: 'flex', gap: '8px', alignItems: 'center' } },
-        this.renderTermSelect(),
-        el('span', { style: { fontSize: '11px', color: 'var(--text-muted)' } },
-          'Controls which courses are synced for calendar & grades'
-        )
-      )
-    );
-    root.appendChild(termCard);
-
-    // 2.5. Theme & Appearance
-    const currentTheme = (typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme')) || 'auto';
-    const themeCard = el(
-      'div',
-      {
-        style: {
-          backgroundColor: 'var(--bg-surface)',
-          border: '1px solid var(--border-color)',
-          borderRadius: 'var(--border-radius-md)',
-          padding: '14px',
-          boxShadow: 'var(--shadow-sm)',
-        },
-      },
-      el('div', { style: { fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase', marginBottom: '8px' } },
-        'Appearance & Theme'
-      ),
-      el('div', { style: { display: 'flex', gap: '8px', alignItems: 'center' } },
-        this.renderThemeSelect(currentTheme),
-        el('span', { style: { fontSize: '11px', color: 'var(--text-muted)' } },
-          'Switch between Light, Dark, or System automatic theme'
-        )
-      )
-    );
-    root.appendChild(themeCard);
-
-    // 3. Course Inspector & Inclusion Toggles
-    const courseCard = el(
-      'div',
-      {
-        style: {
-          backgroundColor: 'var(--bg-surface)',
-          border: '1px solid var(--border-color)',
-          borderRadius: 'var(--border-radius-md)',
-          padding: '14px',
-          boxShadow: 'var(--shadow-sm)',
-        },
-      },
+      { className: 'settings-card privacy-shield-card' },
       el(
         'div',
-        { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '10px' } },
-        el('div', { style: { fontSize: '11px', fontWeight: '700', color: 'var(--text-muted)', textTransform: 'uppercase' } },
-          `Courses in Term (${this.courses.length})`
+        { className: 'privacy-banner-header' },
+        el(
+          'div',
+          { style: { display: 'flex', alignItems: 'center', gap: '8px' } },
+          el('span', { style: { fontSize: '18px' } }, '🛡️'),
+          el(
+            'span',
+            { style: { fontSize: '14px', fontWeight: '800', color: 'var(--text-primary)' } },
+            '100% Client-Side & Private'
+          )
         ),
-        el('span', { style: { fontSize: '11px', color: 'var(--text-muted)' } },
-          'Check to include in Dues & Grades'
+        el(
+          'div',
+          { className: 'privacy-badge-pill' },
+          '✓ Zero Data Collection'
         )
       ),
-      this.renderCoursesList()
-    );
-    root.appendChild(courseCard);
-
-    // 4. Synchronization & Cache Controls
-    const lastSyncFormatted = this.lastSync
-      ? new Date(this.lastSync).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })
-      : 'Never';
-
-    const syncCard = el(
-      'div',
-      {
-        style: {
-          backgroundColor: 'var(--bg-surface)',
-          border: '1px solid var(--border-color)',
-          borderRadius: 'var(--border-radius-md)',
-          padding: '14px',
-          boxShadow: 'var(--shadow-sm)',
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-        },
-      },
       el(
-        'div',
-        {},
-        el('div', { style: { fontSize: '13px', fontWeight: '600', color: 'var(--text-primary)' } }, 'Data Sync'),
-        el('div', { style: { fontSize: '11px', color: 'var(--text-secondary)' } }, `Last updated: ${lastSyncFormatted}`)
+        'p',
+        { style: { fontSize: '12px', color: 'var(--text-secondary)', lineHeight: '1.5', marginBottom: '14px' } },
+        'WatToDue is strictly serverless. Your grades, assignments, and account details never leave your computer. We believe student data belongs solely to the student.'
       ),
       el(
-        'button',
+        'div',
+        { className: 'privacy-points-grid' },
+        el(
+          'div',
+          { className: 'privacy-point' },
+          el('span', { className: 'privacy-point-icon' }, '☁️'),
+          el(
+            'div',
+            {},
+            el('div', { className: 'privacy-point-title' }, 'No External Servers'),
+            el(
+              'div',
+              { className: 'privacy-point-desc' },
+              'WatToDue has no backend servers, cloud databases, or tracking infrastructure. Nothing is ever sent to us.'
+            )
+          )
+        ),
+        el(
+          'div',
+          { className: 'privacy-point' },
+          el('span', { className: 'privacy-point-icon' }, '🔒'),
+          el(
+            'div',
+            {},
+            el('div', { className: 'privacy-point-title' }, 'Direct Connection Only'),
+            el(
+              'div',
+              { className: 'privacy-point-desc' },
+              'All requests communicate directly between your browser and official learn.uwaterloo.ca over your secure session.'
+            )
+          )
+        ),
+        el(
+          'div',
+          { className: 'privacy-point' },
+          el('span', { className: 'privacy-point-icon' }, '👁️'),
+          el(
+            'div',
+            {},
+            el('div', { className: 'privacy-point-title' }, 'Zero Developer Access'),
+            el(
+              'div',
+              { className: 'privacy-point-desc' },
+              'Neither the developer nor any third party can ever see, read, or track your grades, quiz scores, or coursework.'
+            )
+          )
+        ),
+        el(
+          'div',
+          { className: 'privacy-point' },
+          el('span', { className: 'privacy-point-icon' }, '⚖️'),
+          el(
+            'div',
+            {},
+            el('div', { className: 'privacy-point-title' }, 'Free & Open Source Forever'),
+            el(
+              'div',
+              { className: 'privacy-point-desc' },
+              'The complete source code is public and auditable on GitHub under the MIT License. Free forever with zero ads or monetization.'
+            )
+          )
+        )
+      ),
+      el(
+        'div',
+        { className: 'privacy-actions-row' },
+        el(
+          'a',
+          {
+            className: 'btn btn-secondary btn-sm',
+            href: 'https://github.com/blakejjia/WatToDue',
+            target: '_blank',
+            rel: 'noopener noreferrer',
+            style: { gap: '6px' },
+          },
+          '⭐ GitHub Repository & Source Code ↗'
+        ),
+        el(
+          'a',
+          {
+            className: 'btn btn-secondary btn-sm',
+            href: 'https://chromewebstore.google.com/detail/wattodue-waterloo-learn-d/bpigocbcnijjmncfgdloeillfmifcemn',
+            target: '_blank',
+            rel: 'noopener noreferrer',
+            style: { gap: '6px' },
+          },
+          '🛍️ Chrome Web Store ↗'
+        )
+      )
+    );
+  }
+
+  renderCourseChipsCard() {
+    const totalCourses = this.courses.length;
+
+    const selectAllBtn = el(
+      'button',
+      {
+        className: 'btn btn-secondary btn-sm',
+        style: { fontSize: '11px', padding: '2px 8px' },
+        onClick: async () => {
+          this.enabledCourseIds = this.courses.map((c) => c.id);
+          await storageManager.setEnabledCoursesForTerm(this.selectedTerm, this.enabledCourseIds);
+          this.render();
+          await this.onSyncTriggered();
+        },
+      },
+      'Select All'
+    );
+
+    const deselectAllBtn = el(
+      'button',
+      {
+        className: 'btn btn-secondary btn-sm',
+        style: { fontSize: '11px', padding: '2px 8px' },
+        onClick: async () => {
+          this.enabledCourseIds = [];
+          await storageManager.setEnabledCoursesForTerm(this.selectedTerm, this.enabledCourseIds);
+          this.render();
+          await this.onSyncTriggered();
+        },
+      },
+      'Deselect All'
+    );
+
+    return el(
+      'div',
+      { className: 'settings-card' },
+      el(
+        'div',
+        { className: 'settings-section-title' },
+        el('span', {}, `COURSES IN TERM (${totalCourses})`),
+        el('div', { style: { display: 'flex', gap: '6px' } }, selectAllBtn, deselectAllBtn)
+      ),
+      el(
+        'div',
+        { style: { fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '8px' } },
+        'Click course badges to toggle their inclusion in your Dues calendar and Grades calculations:'
+      ),
+      this.renderCourseChips()
+    );
+  }
+
+  renderCourseChips() {
+    if (!this.courses || this.courses.length === 0) {
+      return el(
+        'div',
+        { style: { fontSize: '12px', color: 'var(--text-muted)', padding: '10px 0' } },
+        'No courses discovered for this term.'
+      );
+    }
+
+    const grid = el('div', { className: 'filter-chips-grid' });
+
+    for (const course of this.courses) {
+      const isEnabled = this.enabledCourseIds !== null
+        ? this.enabledCourseIds.includes(course.id)
+        : Boolean(course.defaultEnabled);
+
+      const chip = el(
+        'div',
         {
-          className: 'btn btn-primary',
-          disabled: this.isSyncing,
+          className: `course-chip ${isEnabled ? 'is-active' : 'is-inactive'}`,
+          title: `Click to ${isEnabled ? 'disable' : 'enable'} ${course.displayName || course.name}`,
+          role: 'checkbox',
+          'aria-checked': isEnabled ? 'true' : 'false',
           onClick: async () => {
-            this.isSyncing = true;
-            this.render();
-            try {
-              await this.onSyncTriggered();
-            } finally {
-              this.isSyncing = false;
-              this.render();
+            const currentEnabled = this.enabledCourseIds !== null
+              ? new Set(this.enabledCourseIds)
+              : new Set(this.courses.filter((c) => c.defaultEnabled).map((c) => c.id));
+
+            if (isEnabled) {
+              currentEnabled.delete(course.id);
+            } else {
+              currentEnabled.add(course.id);
             }
+
+            this.enabledCourseIds = Array.from(currentEnabled);
+            await storageManager.setEnabledCoursesForTerm(this.selectedTerm, this.enabledCourseIds);
+            this.render();
+            await this.onSyncTriggered();
           },
         },
-        this.isSyncing ? el('span', { className: 'spinner' }) : '↻',
-        this.isSyncing ? 'Syncing...' : 'Sync Now'
+        el('span', { className: 'course-chip-icon' }, isEnabled ? '✓' : '○'),
+        el('span', {}, course.displayName || course.name)
+      );
+
+      grid.appendChild(chip);
+    }
+
+    return grid;
+  }
+
+  renderPreferencesCard() {
+    const currentTheme = (typeof document !== 'undefined' && document.documentElement.getAttribute('data-theme')) || 'auto';
+
+    return el(
+      'div',
+      { className: 'settings-card' },
+      el(
+        'div',
+        { className: 'settings-section-title' },
+        el('span', {}, 'PREFERENCES')
+      ),
+      el(
+        'div',
+        {
+          style: {
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(260px, 1fr))',
+            gap: '16px',
+            alignItems: 'center',
+          },
+        },
+        el(
+          'div',
+          {},
+          el('div', { style: { fontSize: '12px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' } }, 'Active Term'),
+          this.renderTermSelect()
+        ),
+        el(
+          'div',
+          {},
+          el('div', { style: { fontSize: '12px', fontWeight: '700', color: 'var(--text-primary)', marginBottom: '4px' } }, 'Theme & Appearance'),
+          this.renderThemeSelect(currentTheme)
+        )
       )
     );
-    root.appendChild(syncCard);
-
-    // 5. Version & Info
-    const infoFooter = el(
-      'div',
-      { style: { textAlign: 'center', fontSize: '11px', color: 'var(--text-muted)', marginTop: '8px' } },
-      'WatToDue v1.0.0 · Made for UWaterloo Warriors · Open Source'
-    );
-    root.appendChild(infoFooter);
-
-    this.container.appendChild(root);
   }
 
   renderThemeSelect(currentTheme) {
     const select = el('select', {
       className: 'select-input',
-      style: {
-        padding: '6px 12px',
-        fontSize: '12px',
-        fontWeight: '600',
-        borderRadius: 'var(--border-radius-sm)',
-        border: '1px solid var(--border-color)',
-        backgroundColor: 'var(--bg-app)',
-        color: 'var(--text-primary)',
-        cursor: 'pointer',
-      },
+      style: { width: '100%' },
       onChange: async (e) => {
         const theme = e.target.value;
         if (theme === 'auto') {
@@ -263,6 +438,7 @@ export class SettingsView {
   renderTermSelect() {
     const select = el('select', {
       className: 'select-input',
+      style: { width: '100%' },
       onChange: async (e) => {
         const newTerm = e.target.value;
         this.selectedTerm = newTerm;
@@ -289,86 +465,151 @@ export class SettingsView {
     return select;
   }
 
-  renderCoursesList() {
-    if (!this.courses || this.courses.length === 0) {
-      return el(
-        'div',
-        { style: { fontSize: '12px', color: 'var(--text-muted)', padding: '10px 0' } },
-        'No courses discovered for this term.'
-      );
-    }
+  renderSyncCard() {
+    const lastSyncFormatted = this.lastSync
+      ? new Date(this.lastSync).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', month: 'short', day: 'numeric' })
+      : 'Never';
 
-    const list = el('div', { style: { display: 'flex', flexDirection: 'column', gap: '8px' } });
-
-    for (const course of this.courses) {
-      const isEnabled = this.enabledCourseIds !== null
-        ? this.enabledCourseIds.includes(course.id)
-        : Boolean(course.defaultEnabled);
-
-      const checkbox = el('input', {
-        type: 'checkbox',
-        className: 'due-checkbox',
-        checked: isEnabled,
-        onChange: async (e) => {
-          const checked = e.target.checked;
-          const currentEnabled = this.enabledCourseIds !== null
-            ? new Set(this.enabledCourseIds)
-            : new Set(this.courses.filter((c) => c.defaultEnabled).map((c) => c.id));
-
-          if (checked) {
-            currentEnabled.add(course.id);
-          } else {
-            currentEnabled.delete(course.id);
-          }
-
-          this.enabledCourseIds = Array.from(currentEnabled);
-          await storageManager.setEnabledCoursesForTerm(this.selectedTerm, this.enabledCourseIds);
-          // Auto-trigger sync so Dues and Grades tabs update immediately
-          await this.onSyncTriggered();
+    return el(
+      'div',
+      {
+        className: 'settings-card',
+        style: {
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          gap: '14px',
         },
-      });
+      },
+      el(
+        'div',
+        {},
+        el('div', { style: { fontSize: '13px', fontWeight: '700', color: 'var(--text-primary)' } }, 'Data Sync'),
+        el('div', { style: { fontSize: '11px', color: 'var(--text-secondary)' } }, `Last updated: ${lastSyncFormatted}`)
+      ),
+      el(
+        'button',
+        {
+          className: 'btn btn-primary',
+          disabled: this.isSyncing,
+          onClick: async () => {
+            this.isSyncing = true;
+            this.render();
+            try {
+              await this.onSyncTriggered();
+            } finally {
+              this.isSyncing = false;
+              this.render();
+            }
+          },
+        },
+        this.isSyncing ? el('span', { className: 'spinner' }) : '↻',
+        this.isSyncing ? 'Syncing...' : 'Sync Now'
+      )
+    );
+  }
 
-      const componentBadgeClass = {
-        LEC: 'badge-assignment',
-        LAB: 'badge-lab',
-        TUT: 'badge-tut',
-        PRJ: 'badge-prj',
-        SEM: 'badge-sem',
-        TST: 'badge-overdue',
-      }[course.component] || 'badge-assignment';
-
-      const itemRow = el(
-        'label',
+  renderDangerZoneCard() {
+    return el(
+      'div',
+      { className: 'settings-card settings-danger-card' },
+      el(
+        'div',
         {
           style: {
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '8px 10px',
-            backgroundColor: 'var(--bg-app)',
-            borderRadius: 'var(--border-radius-sm)',
-            cursor: 'pointer',
+            gap: '16px',
+            flexWrap: 'wrap',
           },
         },
         el(
           'div',
-          { style: { display: 'flex', alignItems: 'center', gap: '10px' } },
-          checkbox,
+          { style: { maxWidth: '580px' } },
           el(
             'div',
-            {},
-            el('div', { style: { fontSize: '12px', fontWeight: '600', color: 'var(--text-primary)' } },
-              course.displayName || course.name
-            ),
-            el('div', { style: { fontSize: '10px', color: 'var(--text-muted)' } }, course.code)
+            { style: { fontSize: '13px', fontWeight: '700', color: '#DC2626', marginBottom: '2px' } },
+            'Delete Local User Data'
+          ),
+          el(
+            'div',
+            { style: { fontSize: '11px', color: 'var(--text-secondary)', lineHeight: '1.45' } },
+            'Permanently resets all manual completion checkmarks (including completed & overdue tasks), course selections, and local cache. Your Waterloo LEARN records remain completely untouched.'
           )
         ),
-        el('span', { className: `badge ${componentBadgeClass}` }, course.component || 'OFFERING')
-      );
+        el(
+          'button',
+          {
+            className: 'btn btn-danger',
+            onClick: () => {
+              this.showDeleteModal = true;
+              this.render();
+            },
+          },
+          '🗑️ Delete User Data'
+        )
+      )
+    );
+  }
 
-      list.appendChild(itemRow);
-    }
+  renderDeleteConfirmationModal() {
+    const backdrop = el('div', {
+      className: 'modal-backdrop',
+      onClick: (e) => {
+        if (e.target === backdrop) {
+          this.showDeleteModal = false;
+          this.render();
+        }
+      },
+    });
 
-    return list;
+    const dialog = el(
+      'div',
+      { className: 'modal-dialog' },
+      el(
+        'div',
+        { className: 'modal-header' },
+        el('div', { className: 'modal-header-icon' }, '⚠️'),
+        el('div', { className: 'modal-title' }, 'Delete Local User Data?')
+      ),
+      el(
+        'div',
+        { className: 'modal-body' },
+        'Are you sure you want to delete all local user data? This will clear all manual completed checkmarks (including overdue tasks), custom course visibility filters, and cached dues from this browser.\n\nYour actual Waterloo LEARN account, submissions, and grades will not be affected.'
+      ),
+      el(
+        'div',
+        { className: 'modal-actions' },
+        el(
+          'button',
+          {
+            className: 'btn btn-secondary',
+            onClick: () => {
+              this.showDeleteModal = false;
+              this.render();
+            },
+          },
+          'Cancel'
+        ),
+        el(
+          'button',
+          {
+            className: 'btn btn-danger',
+            onClick: async () => {
+              this.showDeleteModal = false;
+              await storageManager.clearAll();
+              this.enabledCourseIds = null;
+              this.showToast('Local data deleted successfully. Re-syncing...');
+              await this.onSyncTriggered();
+            },
+          },
+          'Yes, Delete Everything'
+        )
+      )
+    );
+
+    backdrop.appendChild(dialog);
+    return backdrop;
   }
 }

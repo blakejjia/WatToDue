@@ -219,3 +219,321 @@
   border: 1px solid #FCA5A5;
   color: #7F1D1D;
 }
+
+/* ==========================================================================
+   Settings View Components & Modern Material Chips
+   ========================================================================== */
+
+.settings-container {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 900px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+.settings-card {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg, 14px);
+  padding: 18px 22px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03), 0 2px 6px rgba(0, 0, 0, 0.02);
+  transition: border-color 0.15s ease;
+}
+
+.settings-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* User Account Profile Header */
+.settings-profile-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.settings-avatar-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.settings-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--border-radius-full);
+  background: linear-gradient(135deg, var(--uw-gold) 0%, #F59E0B 100%);
+  color: #1E1E1E;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 16px;
+  box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25);
+  flex-shrink: 0;
+}
+
+.settings-profile-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.settings-profile-name {
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.2px;
+}
+
+.settings-profile-status {
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.status-dot-active {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background-color: #10B981;
+  display: inline-block;
+  box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+}
+
+/* Privacy & Security Guarantee Card */
+.privacy-shield-card {
+  background: linear-gradient(135deg, rgba(253, 213, 79, 0.08) 0%, rgba(255, 255, 255, 0) 100%), var(--bg-surface);
+  border: 1px solid rgba(212, 160, 23, 0.35);
+}
+
+.privacy-banner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.privacy-badge-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--border-radius-full);
+  background-color: var(--color-success-bg, #DCFCE7);
+  color: var(--color-success, #16A34A);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+.privacy-points-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.privacy-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  background-color: var(--bg-app);
+  padding: 10px 14px;
+  border-radius: var(--border-radius-md);
+  border: 1px solid var(--border-color);
+}
+
+.privacy-point-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.privacy-point-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 2px;
+}
+
+.privacy-point-desc {
+  font-size: 11px;
+  color: var(--text-secondary);
+  line-height: 1.45;
+}
+
+.privacy-actions-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding-top: 4px;
+  border-top: 1px solid var(--border-color-subtle, #F3F4F6);
+}
+
+/* Material Design Filter Chips for Course Selection */
+.filter-chips-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.course-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: var(--border-radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.15s ease-in-out;
+  background-color: var(--bg-app);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+}
+
+.course-chip:hover {
+  transform: translateY(-1px);
+  border-color: var(--uw-gold-dark);
+  color: var(--text-primary);
+}
+
+.course-chip.is-active {
+  background-color: var(--uw-gold-light, #FFF8E1);
+  border: 1.5px solid var(--uw-gold-dark, #D4A017);
+  color: var(--uw-black, #1E1E1E);
+  box-shadow: 0 1px 4px rgba(212, 160, 23, 0.15);
+}
+
+:root[data-theme="dark"] .course-chip.is-active,
+[data-theme="dark"] .course-chip.is-active {
+  background-color: rgba(253, 213, 79, 0.18);
+  border-color: var(--uw-gold);
+  color: #F9FAFB;
+}
+
+.course-chip-icon {
+  font-size: 11px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.course-chip.is-active .course-chip-icon {
+  color: #B45309;
+}
+
+:root[data-theme="dark"] .course-chip.is-active .course-chip-icon,
+[data-theme="dark"] .course-chip.is-active .course-chip-icon {
+  color: var(--uw-gold);
+}
+
+.course-chip.is-inactive .course-chip-icon {
+  color: var(--text-muted);
+}
+
+/* Danger Zone */
+.settings-danger-card {
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  background-color: var(--bg-surface);
+}
+
+.btn-danger {
+  background-color: var(--color-overdue-bg, #FEE2E2);
+  border-color: #FCA5A5;
+  color: var(--color-overdue, #DC2626);
+  font-weight: 600;
+}
+
+.btn-danger:hover {
+  background-color: #DC2626;
+  border-color: #B91C1C;
+  color: #FFFFFF;
+}
+
+/* Modal Dialog */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  animation: modalFadeIn 0.15s ease-out;
+}
+
+.modal-dialog {
+  background-color: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius-lg, 16px);
+  padding: 24px;
+  max-width: 460px;
+  width: 100%;
+  box-shadow: var(--shadow-lg), 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.modal-header-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: var(--color-overdue-bg, #FEE2E2);
+  color: #DC2626;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.modal-title {
+  font-size: 16px;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.modal-body {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.modal-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+@keyframes modalFadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to { opacity: 1; transform: scale(1); }
+}

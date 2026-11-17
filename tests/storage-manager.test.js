@@ -27,4 +27,11 @@ test('storageManager persists completedDueIds and updates dues cache', async () 
   const updatedDues2 = await storageManager.get('dues');
   const d1Again = updatedDues2.find(d => d.id === 'dropbox-1');
   assert.strictEqual(d1Again.completed, false);
+
+  // Test clearAll
+  await storageManager.clearAll();
+  const clearedDues = await storageManager.get('dues');
+  assert.strictEqual(clearedDues, null);
+  const clearedCompleted = await storageManager.get('completedDueIds');
+  assert.strictEqual(clearedCompleted, null);
 });
