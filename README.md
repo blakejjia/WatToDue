@@ -22,6 +22,16 @@
 
 <br>
 
+<div align="center">
+  <img src="docs/assets/screenshot-dues.png" alt="WatToDue Dues Calendar" width="820" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+  <p><sub><i>📅 Unified Dues Timeline across all Waterloo LEARN courses</i></sub></p>
+  <br>
+  <img src="docs/assets/screenshot-grades.png" alt="WatToDue Grades Breakdown" width="820" style="border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.15);">
+  <p><sub><i>📊 Accurate Hierarchical Grades Breakdown & Category Weighting</i></sub></p>
+</div>
+
+<br>
+
 ---
 
 ### 💡 Why WatToDue?
